@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.fragments.home.HomeFragment">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/frag_home_item_img"
+        android:src="@drawable/no_image_default"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/content_desc_scanned_item_image" />
+
+
+    <Button
+        android:id="@+id/frag_home_take_pic_btn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_2xl"
+        android:layout_marginEnd="@dimen/margin_2xl"
+        android:textAlignment="center"
+        android:textSize="@dimen/font_size_md"
+        android:text="@string/start_search"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_item_img" />
+
+    <TextView
+        android:id="@+id/frag_home_no_results_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/font_size_md"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:text="@string/no_local_prices_found"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/frag_home_search_result_linlay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@color/off_white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/frag_home_view_nutrition_btn"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_2xl"
+            android:layout_marginEnd="@dimen/margin_2xl"
+            android:textAlignment="center"
+            android:textSize="@dimen/font_size_md"
+            android:text="@string/view_nutritional_info"
+            style="@style/OrangeButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn" />
+
+
+        <TextView
+            android:id="@+id/frag_home_item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_md"
+            android:layout_marginEnd="@dimen/margin_md"
+            android:layout_marginTop="@dimen/margin_lg"
+            android:textAlignment="center"
+            android:textSize="@dimen/font_size_md"
+            android:textStyle="bold"
+            android:text="@string/local_supermarket_prices"
+
+            />
+
+        <TableLayout
+            android:id="@+id/frag_home_item_prices_tbl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_lg"
+            android:layout_marginStart="@dimen/margin_md"
+            android:layout_marginEnd="@dimen/margin_md"
+            android:paddingLeft="@dimen/padding_md"
+            android:paddingRight="@dimen/padding_md" />
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

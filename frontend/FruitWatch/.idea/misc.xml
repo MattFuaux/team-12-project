@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/glass_background.xml" value="0.382" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/ic_splash_image.xml" value="0.382" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/splash_gradient.xml" value="0.382" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.264" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout-w936dp/activity_login.xml" value="0.4" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/activity_camera.xml" value="0.3619791666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/activity_login.xml" value="0.264" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/activity_main.xml" value="0.3496376811594203" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/activity_splash.xml" value="0.4" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/app_bar_main.xml" value="0.3776041666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/content_main.xml" value="0.3776041666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/fragment_gallery.xml" value="0.14635416666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/fragment_history.xml" value="0.3776041666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/fragment_home.xml" value="0.4" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/nav_header_main.xml" value="0.3496376811594203" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/layout/nutrition_dialog.xml" value="0.34692028985507245" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/menu/activity_main_drawer.xml" value="0.3776041666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/menu/main.xml" value="0.3776041666666667" />
+        <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/xml/root_preferences.xml" value="0.3496376811594203" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
