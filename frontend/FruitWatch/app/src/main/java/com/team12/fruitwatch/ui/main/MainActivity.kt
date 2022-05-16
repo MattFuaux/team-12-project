@@ -8,7 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -22,7 +24,7 @@ import com.team12.fruitwatch.ui.settings.SettingsActivity
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     companion object {
-        const val IN_DEVELOPMENT = false
+        const val IN_DEVELOPMENT = true
         lateinit var userInfo: LoggedInUser
     }
 
@@ -45,7 +47,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val navView: NavigationView = binding.navView
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+        val navController: NavController = navHostFragment.navController
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(

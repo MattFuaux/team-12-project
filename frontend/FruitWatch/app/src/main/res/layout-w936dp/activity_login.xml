@@ -34,7 +34,7 @@
             android:padding="@dimen/padding_lg"
             android:inputType="textEmailAddress"
             android:maxWidth="400dp"
-            android:background="@color/off_white"
+            
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:maxWidth="400dp"
-            android:background="@color/off_white"
+            
             android:padding="@dimen/padding_lg"
             android:hint="@string/prompt_password"
             android:imeActionLabel="@string/action_sign_in_short"
