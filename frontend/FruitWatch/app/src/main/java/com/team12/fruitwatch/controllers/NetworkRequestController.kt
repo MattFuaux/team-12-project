@@ -1,12 +1,30 @@
 package com.team12.fruitwatch.controllers
 
+
 import android.graphics.Bitmap
+import android.util.Log
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.fuel.httpUpload
+import com.github.kittinunf.result.Result
+import com.google.gson.Gson
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
+import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.io.ByteArrayInputStream
+import java.io.DataOutputStream
+import java.io.File
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.nio.charset.Charset
+
 
 class NetworkRequestController {
 
+    private val logTag = "NetworkRequestController"
     private val TEST_JSON_DATA_NUTRITIONAL_INFO = "\"items\":[" +
             "{" +
             "\"name\":\"orange\"," +
@@ -48,22 +66,71 @@ class NetworkRequestController {
             TEST_JSON_DATA_NUTRITIONAL_INFO +
             "}}"
 
-    class Request(user: LoggedInUser, image: Bitmap)
+    class RequestData(var user: LoggedInUser, var imageFileDetails: InputStream,var imgPath: String)
 
-    fun makeServerRequest(itemImage: Bitmap): JSONObject {
-        val request = Request(MainActivity.userInfo, itemImage)
-        val jsonString = getResults(request)
-        return JSONObject(jsonString)
+    data class FruitPredictionResponse(
+        val name: String,
+        val errors: ErrorsResponse?
+    ) {
+
+//        data class Fruit(
+//            val name: String
+//        )
+
+        // If the server prints errors.
+        data class ErrorsResponse(val message: String?)
+
+        // Needed for awaitObjectResponse, awaitObject, etc.
+        class Deserializer :
+            ResponseDeserializable<NetworkRequestController.FruitPredictionResponse> {
+            override fun deserialize(content: String): FruitPredictionResponse =
+                Gson().fromJson(
+                    content,
+                    NetworkRequestController.FruitPredictionResponse::class.java
+                )
+        }
     }
 
-    private fun getResults(request: Request): String {
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun makeServerRequest(itemImageInputStream: InputStream,imgPath:String): String {
+        val request = RequestData(MainActivity.userInfo, itemImageInputStream,imgPath)
+        var fruit: String? = null
+        var result: String = ""
+        runBlocking {
+            //val respose = getFruitPredictionResponse(request).data.toString(Charset.defaultCharset())
+            val respose = getFruitPrediction(request).component1()!!
+            result = respose.name
+            Log.d("RequestResults","Results $result ")
+        }
+        return result
+    }
+
+    private suspend fun getFruitPrediction(request: NetworkRequestController.RequestData): Result<NetworkRequestController.FruitPredictionResponse, FuelError> =
+        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).third
+
+    private suspend fun getFruitPredictionResponse(request: NetworkRequestController.RequestData): Response =
+        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).second
+
+    private suspend fun getFruitPredictionRequest(request: NetworkRequestController.RequestData): Request =
+        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).first
+
+    private fun getResults(request: NetworkRequestController.RequestData): Request {
         // Make network/server call here
-        //val requestResults = okhttpClient.execute(request)
-        val requestResults =
-            TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
-        return requestResults
+        val dataPart: DataPart = FileDataPart.from(request.imgPath+"/searchImage.png", name = "myFile")
+        return Fuel.upload("http://10.1.1.103:8080/upload",Method.POST).add(dataPart)
+        //val requestResults =            TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
     }
 
+//    fun encodeToBase64(image: Bitmap): String? {
+//        val baos = ByteArrayInputStream(image.ninePatchChunk)
+//        image.compress(Bitmap.CompressFormat.PNG, 100, baos)
+//        val b: ByteArray = baos.
+//
+//        val imageEncoded: String = Base64.encodeToString(b, Base64.DEFAULT)
+//        ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
+//        Log.e("LOOK", imageEncoded)
+//        return imageEncoded
+//    }
 //    override fun onPreExecute() {
 //        val activity = activityReference.get()
 //        if (activity == null || activity.isFinishing) return
