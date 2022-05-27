@@ -17,7 +17,7 @@ git@github.com:MattFuaux/team-12-project.git
 ### Initialize Database
 
 - Install MySQL Server and Workbench
-- Start MySQL server and update connection details in `.env ` file if required
+- Start MySQL server and update connection details in the `.env ` file if required
 - Load database schema located in `backend/static/schema/fruitwatchdb.sql`
 
 ### Start Go API Server
@@ -28,7 +28,7 @@ Change directory to the go backend folder
 cd team-12-project/backend
 ```
 
-Download the Go API dependancies (list of dependancies are located in the go.mod file)
+Download the Go API dependancies (list of dependancies are located in `backend/go.mod`)
 
 ```sh
 go get
@@ -42,49 +42,97 @@ go run .
 
 The Go server will start on localhost:8080 by default
 
-## Testing in Postman
+## API Endpoints
 
-Make a post request to localhost:8080/nutrition, navigate to the Body tab (change to raw) and enter in the following JSON:
+### /register
 
-```
-{
-    "name" : "papaya"
-}
-```
+Description: Register a user in the system.
 
-The fruit name can be substituted to any fruit. This will make a call to [CalorieNinja](https://calorieninjas.com/) API, retrieve the nutritional info and serve the result back.
-
-Example:
-![](screenshots/postman-example.png)
-
-## Registration and Authentication
-
-### Registration
-
-Endpoint: ` localhost:8080/register`
-
-Example JSON payload:
+Example Request:
 
 ```
 {
-    "firstName" : "Marck",
-    "lastName" : "Munoz",
-    "email" : "marck527@gmail.com",
+    "firstName" : "John",
+    "lastName" : "Doe",
+    "email" : "john.doe@gmail.com",
     "password" : "Password1"
 }
 ```
 
-### Authentication
-
-Endpoint: `localhost:8080/authenticate`
-
-Note: Upon successful authentication, the server will send back a valid JWT token which can be used for authentication.
-
-Example JSON payload:
+Example Response:
 
 ```
 {
-    "email" : "Marck527@gmail.com",
+    "message": "registration successful",
+    "status": "OK"
+}
+```
+
+### /authenticate
+
+Description: Authenticate a pre-existing user.
+
+Example Request:
+
+```
+{
+    "email" : "john.doe@gmail.com",
     "password" : "Password1"
+}
+```
+
+Example Response:
+
+```
+{
+    "userID": 3,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@gmail.com"
+}
+```
+
+### /logout
+
+Description: Logout an authenticated user.
+
+Example Request:
+N/A - No request payload is required.
+
+Example Response:
+
+```
+{
+    "msg:": "Logout Successful"
+}
+```
+
+### /search (Protected Endpoint)
+
+Description: Upload an image of a fruit to identify and retrieve nutritional information.
+
+Note: Client must be authenticated (have a valid JWT token to access this endpoint)
+
+Example Request:
+Upload picture of a corn:
+
+![corn](screenshots/0030.jpg)
+
+Example Response:
+
+```
+{
+    "name": "Corn",
+    "calories": 93.9,
+    "carbohydrates_total_g": 21,
+    "cholesterol_mg": 0,
+    "fat_saturated_g": 0.2,
+    "fat_total_g": 1.5,
+    "fiber_g": 2.4,
+    "potassium_mg": 75,
+    "protein_g": 3.4,
+    "serving_size_g": 100,
+    "sodium_mg": 1,
+    "sugar_g": 4.6
 }
 ```
