@@ -176,6 +176,23 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+// Logout
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	// delete jwt cookie
+	cookie := &http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour), // set cookie expiry to past
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, cookie)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(map[string]string{"msg:": "Logout Successful"})
+}
+
 // Retrieves nutritional info of a fruit from CalorieNinja
 func getNutritionalInfo(fruitName string) models.FruitNutrition {
 	// API endpoint of CalorieNinja + fruit name parameter passed by the client
