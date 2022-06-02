@@ -115,7 +115,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	// check for errors
 	if len(errors) > 0 {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(401)
 
 		json.NewEncoder(w).Encode(models.Errors{Errors: errors})
 		return
@@ -139,7 +139,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	// check for errors
 	if len(errors) > 0 {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(401)
 
 		json.NewEncoder(w).Encode(models.Errors{Errors: errors})
 		return
