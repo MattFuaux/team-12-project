@@ -3,32 +3,49 @@ import sys
 import numpy as np
 
 from tensorflow import keras
+
 # Supress warning logs from tensorflow. Use version 2.8.0
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-#from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 # In the current implementation and for Golang to execute this script
 # prefix to the machine learning and backend folder are required.
-FILENAME_PREFIX = "C:\\Users\\Marck\\Desktop\\team-12-project\\machine_learning"
-IMG_FILENAME_PREFIX = "C:\\Users\\Marck\\Desktop\\team-12-project\\backend"
+FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/machine_learning"
+IMG_FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/backend"
 
-# Get fruit categories based on training dir subdirectories
-def get_categories():
-	# Training dataset dir
-	train_dir = FILENAME_PREFIX+"/fruits_dataset/train"
-	Name=[]
-	for file in os.listdir(train_dir):
-		Name+=[file]
-	# Create map    
-	#fruit_map = dict(zip(Name, [t for t in range(len(Name))]))
-	#print(fruit_map)
-	r_fruit_map = dict(zip([t for t in range(len(Name))],Name))
-	return r_fruit_map
-	
-# Mapper function
-def category_mapper(value):
-	global r_fruit_map
-	return r_fruit_map[value]
+fruitCategories = {
+	'Apple Braeburn': 0, 
+	'Apple Granny Smith': 1, 
+	'Apricot': 2, 'Avocado': 3, 
+	'Banana': 4, 
+	'Blueberry': 5, 
+	'Cactus fruit': 6, 
+	'Cantaloupe': 7, 
+	'Cherry': 8, 
+	'Clementine': 9, 
+	'Corn': 10, 
+	'Cucumber Ripe': 11, 
+	'Grape Blue': 12, 
+	'Kiwi': 13, 
+	'Lemon': 14, 
+	'Limes': 15, 
+	'Mango': 16, 
+	'Onion White': 17, 
+	'Orange': 18, 
+	'Papaya': 19, 
+	'Passion Fruit': 20, 
+	'Peach': 21, 
+	'Pear': 22, 
+	'Pepper Green': 23, 
+	'Pepper Red': 24, 
+	'Pineapple': 25, 
+	'Plum': 26, 
+	'Pomegranate': 27, 
+	'Potato Red': 28, 
+	'Raspberry': 29, 
+	'Strawberry': 30, 
+	'Tomato': 31, 
+	'Watermelon': 32
+	}
 
 # Load image and convert size	
 def load_image(image_path):
@@ -43,16 +60,19 @@ def load_image(image_path):
 
 # Predict image
 def predict(prediction_image):
-	prediction = model.predict(prediction_image)
-	value = np.argmax(prediction)
-	move_name = category_mapper(value)
-	return move_name
+	predictionVal = model.predict(prediction_image)
+	value = np.argmax(predictionVal)
+	predictedFruit = ""
+	# Loop through fruit category to find the right key
+	for fruit, val in fruitCategories.items():
+		if val == value:
+			predictedFruit = fruit
+
+	return predictedFruit	
 
 
 # Load trained model
 model = keras.models.load_model(FILENAME_PREFIX+'/fruit_model.h5')
-
-r_fruit_map = get_categories()
 
 # test_image = 'fruits_dataset/test/0030.jpg'
 # The uploaded image's location is passed as an argument to this script.
