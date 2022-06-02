@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -256,20 +255,16 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	tempFile.Write(fileBytes)
 	// return that we have successfully uploaded our file!
 
-	// Dodgy way to execute Python script from Go (but it works!)
-	// Update according to your environment
-	python := path.Clean(strings.Join([]string{"C:\\", "Users", "Marck", "AppData", "Local", "Programs", "Python", "Python310", "python.exe"}, "\\"))
-	script := path.Clean(strings.Join([]string{"C:\\", "Users", "Marck", "Desktop", "team-12-project", "machine_learning", "predict.py"}, "\\"))
-	img_path := "\\" + tempFile.Name()
+	img_path := "/" + tempFile.Name()
 
-	// executes the python script using CMD and passes the path of uploaded image
-	cmd := exec.Command(python, script, img_path)
+	// executes the python script using exec and passes the path of uploaded image.
+	cmd := exec.Command("python3", "/home/marck/Desktop/team-12-project/machine_learning/predict.py", img_path)
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// predicted fruit name from python script. 
+	// predicted fruit name from python script.
 	predictionStr := strings.Trim(string(out), "\r\n") // trim "\r\n" from string
 
 	// get nutritional info from CalorieNinja based on predicted fruit name
@@ -285,18 +280,18 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		payload := models.Fruit{
-			Name: predictionStr,
-			Calories: 	fruitNutritionInfo.Items[0].Calories,
-			Carbs: 		fruitNutritionInfo.Items[0].Carbs,
-			Chols: 		fruitNutritionInfo.Items[0].Chols,
-			FatSat: 	fruitNutritionInfo.Items[0].FatSat,
-			FatTotal: 	fruitNutritionInfo.Items[0].FatTotal,
-			Fiber: 		fruitNutritionInfo.Items[0].Fiber,
-			Potassium: 	fruitNutritionInfo.Items[0].Potassium,
-			Protein: 	fruitNutritionInfo.Items[0].Protein,
-			Serving: 	fruitNutritionInfo.Items[0].Serving,
-			Sodium: 	fruitNutritionInfo.Items[0].Sodium,
-			Sugar: 		fruitNutritionInfo.Items[0].Sugar,
+			Name:      predictionStr,
+			Calories:  fruitNutritionInfo.Items[0].Calories,
+			Carbs:     fruitNutritionInfo.Items[0].Carbs,
+			Chols:     fruitNutritionInfo.Items[0].Chols,
+			FatSat:    fruitNutritionInfo.Items[0].FatSat,
+			FatTotal:  fruitNutritionInfo.Items[0].FatTotal,
+			Fiber:     fruitNutritionInfo.Items[0].Fiber,
+			Potassium: fruitNutritionInfo.Items[0].Potassium,
+			Protein:   fruitNutritionInfo.Items[0].Protein,
+			Serving:   fruitNutritionInfo.Items[0].Serving,
+			Sodium:    fruitNutritionInfo.Items[0].Sodium,
+			Sugar:     fruitNutritionInfo.Items[0].Sugar,
 		}
 
 		// Respond in JSON
