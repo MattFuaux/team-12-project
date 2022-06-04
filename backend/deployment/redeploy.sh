@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# move working dir
+cd ..
+
 # ensure we are in the correct branch
 git checkout working-with-ubuntu
 
