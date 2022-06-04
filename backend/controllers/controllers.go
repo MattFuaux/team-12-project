@@ -66,7 +66,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if len(errors) > 0 {
 		// send errors as response
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(200)
+		w.WriteHeader(400)
 
 		json.NewEncoder(w).Encode(models.Errors{Errors: errors}) // send errors as response
 		return
@@ -114,7 +114,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	// check for errors
 	if len(errors) > 0 {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(401)
+		w.WriteHeader(400)
 
 		json.NewEncoder(w).Encode(models.Errors{Errors: errors})
 		return
