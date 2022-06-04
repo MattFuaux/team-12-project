@@ -9,8 +9,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # In the current implementation and for Golang to execute this script
 # prefix to the machine learning and backend folder are required.
-FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/machine_learning"
-IMG_FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/backend"
+FILENAME_PREFIX = "/home/ubuntu/team-12-project/machine_learning"
+IMG_FILENAME_PREFIX = "/home/ubuntu/team-12-project/backend"
 
 fruitCategories = {
 	'Apple Braeburn': 0, 
@@ -74,7 +74,7 @@ def predict(prediction_image):
 # Load trained model
 model = keras.models.load_model(FILENAME_PREFIX+'/fruit_model.h5')
 
-# test_image = 'fruits_dataset/test/0030.jpg'
+# test_image = 'corn.jpg'
 # The uploaded image's location is passed as an argument to this script.
 img_path = IMG_FILENAME_PREFIX+sys.argv[1]
 
