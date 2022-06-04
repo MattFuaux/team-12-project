@@ -7,4 +7,4 @@ git checkout working-on-ubuntu
 git pull
 
 # restart appgo service
-sudo service appgo 
+sudo service appgo restart 
