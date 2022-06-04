@@ -261,6 +261,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	cmd := exec.Command("python3", "/home/ubuntu/team-12-project/machine_learning/predict.py", img_path)
 	out, err := cmd.Output()
 	if err != nil {
+		fmt.Println("predict.py script execution error")
 		log.Fatal(err)
 	}
 
