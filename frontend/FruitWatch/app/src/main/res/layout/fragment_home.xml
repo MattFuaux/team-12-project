@@ -32,6 +32,20 @@
         app:layout_constraintTop_toBottomOf="@+id/frag_home_item_img" />
 
     <TextView
+        android:id="@+id/frag_home_pred_fruit_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_lg"
+        android:textSize="@dimen/font_size_md"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:text="@string/no_local_prices_found"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+         />
+
+    <TextView
         android:id="@+id/frag_home_no_results_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +55,7 @@
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_pred_fruit_name"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <LinearLayout

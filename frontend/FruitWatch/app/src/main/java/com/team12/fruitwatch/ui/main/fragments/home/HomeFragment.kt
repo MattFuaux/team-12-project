@@ -1,9 +1,13 @@
 package com.team12.fruitwatch.ui.main.fragments.home
 
+import android.R.attr.bitmap
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.TypedValue
@@ -20,9 +24,11 @@ import com.team12.fruitwatch.databinding.FragmentHomeBinding
 import com.team12.fruitwatch.ui.dialog.NutritionDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.*
 import java.text.DecimalFormat
 import java.util.*
 
@@ -35,6 +41,7 @@ class HomeFragment : Fragment() {
     lateinit var itemImg: ImageView
     lateinit var resultLayout: LinearLayout
     lateinit var noResultsTV: TextView
+    lateinit var predFruitNameTV: TextView
     lateinit var viewNutritionBtn: Button
     private var nutritionDialog: NutritionDialog? = null
 
@@ -72,6 +79,8 @@ class HomeFragment : Fragment() {
         itemImg = root.findViewById(R.id.frag_home_item_img)
         resultLayout = root.findViewById(R.id.frag_home_search_result_linlay)
         noResultsTV = root.findViewById(R.id.frag_home_no_results_tv)
+        predFruitNameTV = root.findViewById(R.id.frag_home_pred_fruit_name)
+
         pricesTblLay = root.findViewById(R.id.frag_home_item_prices_tbl)
         viewNutritionBtn = root.findViewById(R.id.frag_home_view_nutrition_btn)
         viewNutritionBtn.setOnClickListener { nutritionDialog?.show() }
@@ -97,34 +106,81 @@ class HomeFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data!!.extras!!.get("data") as Bitmap
             itemImg.setImageBitmap(imageBitmap)
+            val imgPath = saveToInternalStorage(imageBitmap, "searchImage.png")
             uiScope.launch {
-                makeNetworkCall(imageBitmap)
+                makeNetworkCall(imageBitmap,imgPath!!)
             }
         }
     }
 
-    private fun makeNetworkCall(imageBitmap: Bitmap) {
-        val result: JSONObject = NetworkRequestController().makeServerRequest(imageBitmap)
-        val resultPrices: JSONArray = result.getJSONObject("prices").optJSONArray("stores")!!
-        val resultNutrition: JSONArray = result.getJSONObject("nutrition").optJSONArray("items")!!
-
-        if (resultPrices.length() > 0) {
-            noResultsTV.visibility = View.GONE
-            pricesTblLay.visibility = View.VISIBLE
-            resultLayout.visibility = View.VISIBLE
-            loadPricesData(resultPrices)
-        } else {
-            resultLayout.visibility = View.GONE
-            pricesTblLay.visibility = View.GONE
-            noResultsTV.visibility = View.VISIBLE
+    private fun saveToInternalStorage(bitmapImage: Bitmap, imageName: String): String? {
+        val cw = ContextWrapper(context)
+        // path to /data/data/yourapp/app_data/imageDir
+        val directory: File = cw.getDir("search_images", Context.MODE_PRIVATE)
+        // Create imageDir
+        val mypath = File(directory, imageName)
+        var fos: FileOutputStream? = null
+        try {
+            fos = FileOutputStream(mypath)
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                fos?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
+        return directory.absolutePath
+    }
 
-        if (resultNutrition.length() > 0) {
-            viewNutritionBtn.visibility = View.VISIBLE
-            nutritionDialog = NutritionDialog(requireContext(), imageBitmap, resultNutrition)
-        } else {
-            viewNutritionBtn.visibility = View.GONE
+    private fun makeNetworkCall(imageBitmap: Bitmap, imgPath:String) {
+
+        GlobalScope.launch(Dispatchers.IO) {
+
+            val bos = ByteArrayOutputStream()
+            imageBitmap.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos)
+            val bitmapdata: ByteArray = bos.toByteArray()
+            val bs = ByteArrayInputStream(bitmapdata)
+            //val result: JSONObject = NetworkRequestController().makeServerRequest(bs,imgPath)
+            val result = NetworkRequestController().makeServerRequest(bs,imgPath)
+
+            GlobalScope.launch(Dispatchers.Main) {
+//                val resultPrices: JSONArray =
+//                    result.getJSONObject("prices").optJSONArray("stores")!!
+//                val resultNutrition: JSONArray =
+//                    result.getJSONObject("nutrition").optJSONArray("items")!!
+                val fruitName = result.trimEnd()
+                updateSearchResultFields(fruitName)
+
+//                if (resultPrices.length() > 0) {
+//                    noResultsTV.visibility = View.GONE
+//                    pricesTblLay.visibility = View.VISIBLE
+//                    resultLayout.visibility = View.VISIBLE
+//                    loadPricesData(resultPrices)
+//                } else {
+//                    resultLayout.visibility = View.GONE
+//                    pricesTblLay.visibility = View.GONE
+//                    noResultsTV.visibility = View.VISIBLE
+//                }
+//
+//                if (resultNutrition.length() > 0) {
+//
+//                    viewNutritionBtn.visibility = View.VISIBLE
+//                    nutritionDialog =
+//                        NutritionDialog(requireContext(), imageBitmap, resultNutrition)
+//                } else {
+//                    viewNutritionBtn.visibility = View.GONE
+//                }
+            }
         }
+    }
+
+    fun updateSearchResultFields(fruitName: String) {
+        predFruitNameTV.visibility = View.VISIBLE
+        predFruitNameTV.text = fruitName
     }
 
     private fun processPrices(resultPrices: JSONArray): Array<PriceData?> {

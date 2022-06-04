@@ -3,6 +3,7 @@ import sys
 import numpy as np
 
 from tensorflow import keras
+
 # Supress warning logs from tensorflow. Use version 2.8.0
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 #from tensorflow.keras.preprocessing.image import img_to_array, load_img
@@ -49,6 +50,8 @@ def predict(prediction_image):
 	return move_name
 
 
+
+#print("Running Fruit Watch Predictor..")
 # Load trained model
 model = keras.models.load_model(FILENAME_PREFIX+'/fruit_model.h5')
 
