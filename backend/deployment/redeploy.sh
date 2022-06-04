@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # ensure we are in the correct branch
-git checkout working-with-ubuntu
+git checkout working-on-ubuntu
 
 # pull latest
 git pull
