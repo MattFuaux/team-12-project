@@ -23,7 +23,7 @@ def coles_scrape():
     chrome_options.add_argument("--headless")
 
     #Enter Webdriver path
-    s=Service('/home/marck/Desktop/team-12-project/scraper/chromedriver')
+    s=Service('/home/ubuntu/team-12-project/scraper/chromedriver')
     driver = webdriver.Chrome(service=s, options=chrome_options)
     today = date.today()
     mylist = []
