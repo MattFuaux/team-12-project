@@ -296,7 +296,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	img_path := "/" + tempFile.Name()
 
 	// executes the python script using exec and passes the path of uploaded image.
-	cmd := exec.Command("python3", "/home/marck/Desktop/team-12-project/machine_learning/predict.py", img_path)
+	cmd := exec.Command("python3", "/home/ubuntu/team-12-project/machine_learning/predict.py", img_path)
 	out, err := cmd.Output()
 	if err != nil {
 		fmt.Println("predict.py script execution error")
