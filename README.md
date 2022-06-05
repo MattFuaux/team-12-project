@@ -1,23 +1,38 @@
 # Team 12 FruitWatch Project
 
+## Folder Structure
+
 - `backend` folder contains implementation of the API server in Golang
 - `frontend` folder contains the Android frontend application
 - `machine_learning` folder contains the neural network training notebook, pre-trained model as well as a link to the dataset used
 
 
-# Server Setup Steps (AWS EC2 Ubuntu)
-- Install Golang 
-- Install MySQL server and load database schema located in ```/backend/static/schema/fruitwatchdb.sql```
-- Update ```/backend/.env``` file to the correct MySQL connection details
+## Server Setup Steps (AWS EC2 Ubuntu)
+The FruitWatch API server is hosted in AWS and is running on an EC2 ```t2.medium``` instance with Ubuntu ```20.04 LTS``` image.
+
+### EC2 instance setup
+- Allow ingress and egress http/https traffic by creating a security group and applying it to the instance.
+- Create a new SSH key pair and add to your GitHub account.
+
+### FruitWatch application setup
+#### Install dependancies
+- Install Golang ```v1.18.3```
+- Install MySQL server ```v8.0.29-0ubuntu0.20.04.3```
 - Install pip: ```sudo apt install python3-pip```
 - Install numpy: ```pip install numpy```
-- Install tensorflow version 2.8.0: ```pip install tensorflow==2.8.0```
+- Install tensorflow v2.8.0: ```pip install tensorflow==2.8.0```
+#### Configure database
+- Load FruitWatch database schema in MySQL located in: ```team-12-project/backend/static/schema/fruitwatchdb.sql```
+- Update MySQL connection details in ```team-12-project/backend/.env```
+#### Update application paths
+- Update paths in the ```team-12-project/machine-learning/predict.py``` script
+- Update paths in ```team-12-project/backend/controllers/controllers.go``` line ```261```
+#### Environment variable(s)
 - Set environment variable (required for tensorflow): ```export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python```
-- Update paths in the ```/machine-learning/predict.py``` script
-- Update paths in ```/backend/controllers/controllers.go``` line 261
-- Created systemd service to run the go app in the background: ```sudo nano etc/systemd/system/appgo.service```
+#### Create systemd service
+- Create systemd service to run the go app in the background: ```sudo nano etc/systemd/system/appgo.service```
 
-appgo.service
+Add the following to ```appgo.service```
 ```
 [Unit]
 Description=FruitWatch Go Service
@@ -39,10 +54,18 @@ Environment=PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 [Install]
 WantedBy=multi-user.target
 ```
-Commands to start/stop and check status of service
+
+##### Commands to start/stop and check status of service
 ```
 sudo service appgo start
 sudo service appgo status
 sudo service appgo stop
 ```
+
+## Re-deploying service
+Redeployment script is located in: ```team-12-project/backend/deployment/redeploy.sh```
+
+The script runs the following steps:
+1. Checks out the ```working-on-ubuntu``` branch and pulls latest.
+2. Restarts the ```appgo``` service.
 
