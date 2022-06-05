@@ -5,6 +5,7 @@
 - `backend` folder contains implementation of the API server in Golang
 - `frontend` folder contains the Android frontend application
 - `machine_learning` folder contains the neural network training notebook, pre-trained model as well as a link to the dataset used
+- `scraping` folder contains scraping script. Currently only scrapes Coles
 
 
 ## Server Setup Steps (AWS EC2 Ubuntu)
