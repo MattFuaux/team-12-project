@@ -215,6 +215,44 @@ func getNutritionalInfo(fruitName string) models.FruitNutrition {
 	return fruitNutrition
 }
 
+// Get fruit Coles price
+func getColesPrice(fruitName string) map[string]string {
+	// Open our jsonFile
+	jsonFile, err := os.Open("../scraper/fruitPrices.json")
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		fmt.Println("Cannot open Coles fruit prices JSON.")
+	}
+	fmt.Println("Successfully opened Coles fruit prices JSON")
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer jsonFile.Close()
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	// we initialize our ColesFruitPrices array
+	var colesFruitPrices models.ColesFruitPrices
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into 'colesFruitPrices' which we defined above
+	json.Unmarshal(byteValue, &colesFruitPrices)
+
+	//fmt.Print(colesFruitPrices)
+	for i := 0; i < len(colesFruitPrices.ColesFruitPrices); i++ {
+		//fmt.Println("Fruit Name: " + colesFruitPrices.ColesFruitPrices[i].Name)
+		if fruitName == colesFruitPrices.ColesFruitPrices[i].Name {
+			store := colesFruitPrices.ColesFruitPrices[i].Store
+			price := colesFruitPrices.ColesFruitPrices[i].Price
+			quantity := colesFruitPrices.ColesFruitPrices[i].Quantity
+			date := colesFruitPrices.ColesFruitPrices[i].Date
+
+			return map[string]string{"store": store, "price": price, "quantity": quantity, "date": date}
+		}
+	}
+
+	return nil
+}
+
 // SearchHandler accepts an input image, predicts the type of fruit then returns fruit nutritional info
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("File Upload Endpoint Hit")
@@ -258,7 +296,7 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	img_path := "/" + tempFile.Name()
 
 	// executes the python script using exec and passes the path of uploaded image.
-	cmd := exec.Command("python3", "/home/ubuntu/team-12-project/machine_learning/predict.py", img_path)
+	cmd := exec.Command("python3", "/home/marck/Desktop/team-12-project/machine_learning/predict.py", img_path)
 	out, err := cmd.Output()
 	if err != nil {
 		fmt.Println("predict.py script execution error")
@@ -271,13 +309,30 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// get nutritional info from CalorieNinja based on predicted fruit name
 	fruitNutritionInfo := getNutritionalInfo(predictionStr)
 
+	// get coles pricing
+	colesPriceMap := getColesPrice(predictionStr)
+
 	// The model will always output a prediction but the predicted fruit may not exist in CalorieNinja
 	// if this is the case, just return the name of the predicted fruit with a message.
 	if len(fruitNutritionInfo.Items) == 0 {
+		// send details with no nutiritonal info
+		payload := models.Fruit{
+			Name: predictionStr,
+			Prices: []models.Price{
+				{
+					Store:    colesPriceMap["store"],
+					Price:    colesPriceMap["price"],
+					Quantity: colesPriceMap["quantity"],
+					Date:     colesPriceMap["date"],
+				},
+			},
+		}
+
+		// Respond in JSON
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 
-		json.NewEncoder(w).Encode(map[string]string{"name:": predictionStr, "msg:": "Unable to find nutritional info."})
+		json.NewEncoder(w).Encode(payload)
 
 	} else {
 		payload := models.Fruit{
@@ -293,6 +348,14 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 			Serving:   fruitNutritionInfo.Items[0].Serving,
 			Sodium:    fruitNutritionInfo.Items[0].Sodium,
 			Sugar:     fruitNutritionInfo.Items[0].Sugar,
+			Prices: []models.Price{
+				{
+					Store:    colesPriceMap["store"],
+					Price:    colesPriceMap["price"],
+					Quantity: colesPriceMap["quantity"],
+					Date:     colesPriceMap["date"],
+				},
+			},
 		}
 
 		// Respond in JSON
