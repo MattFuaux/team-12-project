@@ -5,6 +5,8 @@ package com.team12.fruitwatch.ui.login
  */
 
 data class LoggedInUserView(
-    val displayName: String
+    val userId: String,
+    val displayName: String,
+    val jwt: String
     //... other data fields that may be accessible to the UI
 )

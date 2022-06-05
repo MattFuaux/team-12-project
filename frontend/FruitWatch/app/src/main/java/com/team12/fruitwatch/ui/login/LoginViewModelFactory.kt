@@ -2,8 +2,8 @@ package com.team12.fruitwatch.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.team12.fruitwatch.data.LoginDataSource
-import com.team12.fruitwatch.data.LoginRepository
+import com.team12.fruitwatch.data.AuthenticationDataSource
+import com.team12.fruitwatch.data.AuthenticationRepository
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.
@@ -15,8 +15,8 @@ class LoginViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
             return LoginViewModel(
-                loginRepository = LoginRepository(
-                    dataSource = LoginDataSource()
+                loginRepository = AuthenticationRepository(
+                    dataSource = AuthenticationDataSource()
                 )
             ) as T
         }

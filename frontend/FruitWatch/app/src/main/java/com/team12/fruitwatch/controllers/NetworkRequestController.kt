@@ -5,10 +5,14 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.extensions.jsonBody
+import com.github.kittinunf.fuel.gson.jsonBody
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpUpload
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.*
@@ -25,6 +29,14 @@ import java.nio.charset.Charset
 class NetworkRequestController {
 
     private val logTag = "NetworkRequestController"
+
+    private val URL_PREFIX = "http://"
+    private val URL_IP = "54.253.79.220:8080"
+    private val URL_REGISTER = "$URL_PREFIX$URL_IP/register"
+    private val URL_LOGIN = "$URL_PREFIX$URL_IP/authenticate"
+    private val URL_LOGOUT = "$URL_PREFIX$URL_IP/logout"
+    private val URL_SEARCH = "$URL_PREFIX$URL_IP/search"
+
     private val TEST_JSON_DATA_NUTRITIONAL_INFO = "\"items\":[" +
             "{" +
             "\"name\":\"orange\"," +
@@ -66,114 +78,105 @@ class NetworkRequestController {
             TEST_JSON_DATA_NUTRITIONAL_INFO +
             "}}"
 
-    class RequestData(var user: LoggedInUser, var imageFileDetails: InputStream,var imgPath: String)
+    data class ResponseData(
+        val statusCode:Int,
+        val data: Any?,
+        val error: FuelError?
+        )
 
-    data class FruitPredictionResponse(
-        val name: String,
-        val errors: ErrorsResponse?
-    ) {
+    data class RegistrationDetails(
+        @SerializedName("firstName")
+        val firstame:String,
+        @SerializedName("lastName")
+        val surname:String,
+        @SerializedName("email")
+        val email:String,
+        @SerializedName("password")
+        val password: String
+        )
 
-//        data class Fruit(
-//            val name: String
-//        )
+    data class LoginDetails(
+        @SerializedName("email")
+        val email:String,
+        @SerializedName("password")
+        val password:String
+        )
 
-        // If the server prints errors.
-        data class ErrorsResponse(val message: String?)
+    data class StorePrice(
+        val store:String,
+        val price:String,
+        val quantity:String?,
+        val date:String
+        )
 
-        // Needed for awaitObjectResponse, awaitObject, etc.
-        class Deserializer :
-            ResponseDeserializable<NetworkRequestController.FruitPredictionResponse> {
-            override fun deserialize(content: String): FruitPredictionResponse =
-                Gson().fromJson(
-                    content,
-                    NetworkRequestController.FruitPredictionResponse::class.java
-                )
-        }
-    }
+    data class ItemNutrition(
+        val name:String?,
+        val calories:String?,
+        val carbohydrates_total_g:String?,
+        val cholesterol_mg:String?,
+        val fat_saturated_g:String?,
+        val fat_total_g:String?,
+        val fiber_g:String?,
+        val potassium_mg:String?,
+        val protein_g:String?,
+        val serving_size_g:String?,
+        val sodium_mg:String?,
+        val sugar_g:String?
+        )
+    data class SearchResults(
+        @SerializedName("prices")
+        val prices: List<StorePrice>?,
+//        @SerializedName("nutrition")
+//        val nutrition: ItemNutrition?
+        val name:String,
+        val calories:String?,
+        val carbohydrates_total_g:String?,
+        val cholesterol_mg:String?,
+        val fat_saturated_g:String?,
+        val fat_total_g:String?,
+        val fiber_g:String?,
+        val potassium_mg:String?,
+        val protein_g:String?,
+        val serving_size_g:String?,
+        val sodium_mg:String?,
+        val sugar_g:String?
+        )
 
-    @OptIn(DelicateCoroutinesApi::class)
-    suspend fun makeServerRequest(itemImageInputStream: InputStream,imgPath:String): String {
-        val request = RequestData(MainActivity.userInfo, itemImageInputStream,imgPath)
-        var fruit: String? = null
-        var result: String = ""
-        runBlocking {
-            //val respose = getFruitPredictionResponse(request).data.toString(Charset.defaultCharset())
-            val respose = getFruitPrediction(request).component1()!!
-            result = respose.name
-            Log.d("RequestResults","Results $result ")
-        }
-        return result
-    }
-
-    private suspend fun getFruitPrediction(request: NetworkRequestController.RequestData): Result<NetworkRequestController.FruitPredictionResponse, FuelError> =
-        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).third
-
-    private suspend fun getFruitPredictionResponse(request: NetworkRequestController.RequestData): Response =
-        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).second
-
-    private suspend fun getFruitPredictionRequest(request: NetworkRequestController.RequestData): Request =
-        getResults(request).awaitResponseResult(NetworkRequestController.FruitPredictionResponse.Deserializer()).first
-
-    private fun getResults(request: NetworkRequestController.RequestData): Request {
+    fun startSearch(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
         // Make network/server call here
-        val dataPart: DataPart = FileDataPart.from(request.imgPath+"/searchImage.png", name = "myFile")
-        return Fuel.upload("http://10.1.1.103:8080/upload",Method.POST).add(dataPart)
-        //val requestResults =            TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+        val dataPart: DataPart = FileDataPart(imageToPredict)
+        val response = Fuel.upload(URL_SEARCH,Method.POST).add(dataPart).header(Headers.COOKIE to loggedInUser.jwt).response()
+        val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
+        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+        val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+        return resultObject
     }
 
-//    fun encodeToBase64(image: Bitmap): String? {
-//        val baos = ByteArrayInputStream(image.ninePatchChunk)
-//        image.compress(Bitmap.CompressFormat.PNG, 100, baos)
-//        val b: ByteArray = baos.
-//
-//        val imageEncoded: String = Base64.encodeToString(b, Base64.DEFAULT)
-//        ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
-//        Log.e("LOOK", imageEncoded)
-//        return imageEncoded
-//    }
-//    override fun onPreExecute() {
-//        val activity = activityReference.get()
-//        if (activity == null || activity.isFinishing) return
-//        activity.progressBar.visibility = View.VISIBLE
-//    }
-//
-//    override fun doInBackground(vararg params: Int?): String? {
-//        publishProgress("Sleeping Started") // Calls onProgressUpdate()
-//        try {
-//            val time = params[0]?.times(1000)
-//            time?.toLong()?.let { Thread.sleep(it / 2) }
-//            publishProgress("Half Time") // Calls onProgressUpdate()
-//            time?.toLong()?.let { Thread.sleep(it / 2) }
-//            publishProgress("Sleeping Over") // Calls onProgressUpdate()
-//            resp = "Android was sleeping for " + params[0] + " seconds"
-//        } catch (e: InterruptedException) {
-//            e.printStackTrace()
-//            resp = e.message
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            resp = e.message
-//        }
-//
-//        return resp
-//    }
-//
-//
-//    override fun onPostExecute(result: String?) {
-//
-//        val activity = activityReference.get()
-//        if (activity == null || activity.isFinishing) return
-//        activity.progressBar.visibility = View.GONE
-//        activity.textView.text = result.let { it }
-//        activity.myVariable = 100
-//    }
-//
-//    override fun onProgressUpdate(vararg text: String?) {
-//
-//        val activity = activityReference.get()
-//        if (activity == null || activity.isFinishing) return
-//
-//        Toast.makeText(activity, text.firstOrNull(), Toast.LENGTH_SHORT).show()
-//
-//    }
+    fun registerUser(firstname:String, surname: String, email:String, password: String): ResponseData {
+        // Make network/server call here
+        val response = Fuel.post(URL_REGISTER).jsonBody(RegistrationDetails(firstname,surname,email,password)).response()
+        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+        return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
+    }
 
+    fun loginUser(email:String, password: String): ResponseData {
+        // Make network/server call here
+        val response = Fuel.post(URL_LOGIN).jsonBody(LoginDetails(email,password)).response()
+        if(response.second.statusCode == 200 && response.second.header("Set-Cookie").isNotEmpty()){
+            val cookieHeader = (response.second.headers["Set-Cookie"] as List<String>)[0]
+            val cookie = cookieHeader.split(";")[0]
+            val jsonBody = String(response.second.data, Charset.defaultCharset())
+            val jsonResponse = JSONObject(jsonBody)
+            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),jsonResponse.get("firstName").toString()+" "+jsonResponse.get("lastName").toString() ,cookie),response.third.component2())
+        }
+
+        return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
+    }
+
+    fun logoutUser(jwt: String): ResponseData {
+        // Make network/server call here
+        val response = Fuel.post(URL_LOGOUT).response()
+        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+        return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
+    }
 }

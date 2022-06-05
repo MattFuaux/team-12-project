@@ -38,7 +38,7 @@
         android:layout_marginTop="@dimen/margin_lg"
         android:textSize="@dimen/font_size_md"
         android:textStyle="bold"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/font_size_md"
         android:textStyle="bold"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,10 +65,10 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:background="@color/off_white"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+        app:layout_constraintTop_toBottomOf="@+id/frag_home_pred_fruit_name"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
