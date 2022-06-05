@@ -9,8 +9,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # In the current implementation and for Golang to execute this script
 # prefix to the machine learning and backend folder are required.
-FILENAME_PREFIX = "/home/ubuntu/team-12-project/machine_learning"
-IMG_FILENAME_PREFIX = "/home/ubuntu/team-12-project/backend"
+FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/machine_learning"
+IMG_FILENAME_PREFIX = "/home/marck/Desktop/team-12-project/backend"
 
 fruitCategories = {
 	'Apple Braeburn': 0, 
