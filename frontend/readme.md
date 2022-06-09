@@ -1,4 +1,4 @@
-# Fruit Watch Android App v0.1
+# Fruit Watch Android App v0.2
 
 ## What is the app used for?
 The Fruit Watch Android app is simply used as a frontend for the Fruit Watch project. The app will first ask for a users credentials to log in to their required Fruit Watch account. Once logged in the app then provides the user with the ability to start a search by taking a picture, then viewing the results of that search on their mobile smartphone. The app also will keep track of previous searches that the user has made so they can be viewed when ever or searched again at a later time.
