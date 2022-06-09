@@ -1,12 +1,16 @@
 # FruitWatch Backend API
 
-FruitWatch backend API
+Author: Marck Munoz
+
+FruitWatch REST API to handle requests from the front-end. The API is responsible for user registration, authentication as well as predicting the fruit based on images sent by the client and then returning nutritional information and pricing information of the fruit back to the client.
+
+Although our frontend client is the Android app, becuase of the design of the API, it can easily be re-used to work with a different client (e.g React app).
 
 ## Installation
 
 ### Prerequisite
 
-Golang version 1.18 or greater.
+Golang version 1.18 or greater
 
 ### Clone Repo
 
@@ -40,7 +44,7 @@ Start the Go server
 go run .
 ```
 
-The Go server will start on localhost:8080 by default
+The Go server will start on `localhost:8080` by default
 
 ## API Endpoints
 
@@ -70,7 +74,7 @@ Example Response:
 
 ### /authenticate
 
-Description: Authenticate a pre-existing user.
+Description: Authenticate a pre-existing user and return a valid JWT token.
 
 Example Request:
 
@@ -125,7 +129,6 @@ Example Response:
     "name": "Corn",
     "calories": 93.9,
     "carbohydrates_total_g": 21,
-    "cholesterol_mg": 0,
     "fat_saturated_g": 0.2,
     "fat_total_g": 1.5,
     "fiber_g": 2.4,
@@ -133,6 +136,14 @@ Example Response:
     "protein_g": 3.4,
     "serving_size_g": 100,
     "sodium_mg": 1,
-    "sugar_g": 4.6
+    "sugar_g": 4.6,
+    "prices": [
+        {
+            "store": "coles",
+            "price": "1.80",
+            "quantity": "each",
+            "date": "2022-06-05"
+        }
+    ]
 }
 ```
