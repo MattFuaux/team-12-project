@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/subosito/gotenv"
 
+	"backend/database"
 	routes "backend/routes"
 )
 
@@ -20,6 +21,15 @@ func init() {
 }
 
 func main() {
+
+	// connect to database and test connection
+	database.ConnectDB()
+	err := database.DB.Ping()
+	if err != nil {
+		log.Fatalln("error: unable to connect to the database.")
+	} else {
+		fmt.Print("Connected to database\n")
+	}
 
 	// create new gorilla mux router
 	r := mux.NewRouter()
