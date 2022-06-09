@@ -17,3 +17,19 @@ The Fruit Watch Android app is just a frontend. It does not process the image us
 - Settings 
 - Search History List
 - UI Finer details (Animations, etc)
+
+<hr>
+<br>
+
+# How to install the APK file and use Fruit Watch 
+
+## Prerequisites
+  - Smartphone with at least Android 7.0 (Nougat)
+  - The latest APK file found in the "frontend/APKs" folder in this repository
+
+## Installation Steps
+1. Copy the APK file to your smartphone.
+2. Follow the steps in this article to enable installation from unknown sources. https://www.wikihow.com/Allow-Apps-from-Unknown-Sources-on-Android
+3. In the file manager/file explorer on your smartphone locate the APK file, then select/open it.
+4. Follow the prompts to install the APK file.
+5. After installing the APK file, you can open the app directly after the install or find "Fruit Watch" in your installed apps drawer/list.
