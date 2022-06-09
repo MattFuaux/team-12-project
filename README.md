@@ -2,19 +2,19 @@
 
 ## Folder Structure
 
-- `backend` folder contains implementation of the API server in Golang
-- `frontend` folder contains the Android frontend application
-- `machine_learning` folder contains the neural network training notebook, pre-trained model as well as a link to the dataset used
-- `scraper` folder contains scraping script. Currently only scrapes Coles
+- `backend` folder contains implementation of the backend API server written in Golang.
+- `frontend` folder contains the Android frontend application code.
+- `machine_learning` folder contains the neural network training notebook used, pre-trained fruit prediction model and information about the datasets.
+- `scraper` folder contains scraping script written in Python to scrape fruit prices (Currently only scrapes Coles).
 
-## Server Setup Steps (AWS EC2 Ubuntu)
+## Server Setup
 
-The FruitWatch API server is hosted in AWS and is running on an EC2 `t2.medium` instance with Ubuntu `20.04 LTS` image.
+The FruitWatch API server is hosted in AWS and is running on an EC2 `t2.medium` instance using an Ubuntu `20.04 LTS` image.
 
 ### EC2 instance setup
 
 - Allow ingress and egress http/https traffic by creating a security group and applying it to the instance.
-- Create a new SSH key pair and add to your GitHub account.
+- Create a new SSH key pair and add to GitHub account.
 
 ### FruitWatch application setup
 
@@ -82,5 +82,5 @@ Redeployment script is located in: `team-12-project/backend/deployment/redeploy.
 
 The script runs the following steps:
 
-1. Checks out the `working-on-ubuntu` branch and pulls latest.
+1. Checks out the `main` branch and pulls latest.
 2. Restarts the `appgo` service.
