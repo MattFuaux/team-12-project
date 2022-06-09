@@ -7,7 +7,7 @@ import com.team12.fruitwatch.data.model.LoggedInUser
  * maintains an in-memory cache of login status and user credentials information.
  */
 
-class LoginRepository(val dataSource: LoginDataSource) {
+class AuthenticationRepository(val dataSource: AuthenticationDataSource) {
 
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null
@@ -22,14 +22,9 @@ class LoginRepository(val dataSource: LoginDataSource) {
         user = null
     }
 
-    fun logout() {
-        user = null
-        dataSource.logout()
-    }
-
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    suspend fun login(email: String, password: String): Result<LoggedInUser> {
         // handle login
-        val result = dataSource.login(username, password)
+        val result = dataSource.login(email, password)
 
         if (result is Result.Success) {
             setLoggedInUser(result.data)
@@ -38,7 +33,29 @@ class LoginRepository(val dataSource: LoginDataSource) {
         return result
     }
 
-    private fun setLoggedInUser(loggedInUser: LoggedInUser) {
+    suspend fun register(firstname:String, surname: String, email:String, password: String): Result<LoggedInUser> {
+        // handle login
+        val registrationResult = dataSource.register(firstname, surname, email, password)
+
+        if (registrationResult is Result.Success) {
+            return login(email, password)
+        }
+        return registrationResult
+    }
+
+    suspend fun logout(jwt:String): Boolean {
+        // handle login
+        val result = dataSource.logout(jwt)
+
+        if (result) {
+            setLoggedInUser(null)
+            return true
+        }
+
+        return false
+    }
+
+    private fun setLoggedInUser(loggedInUser: LoggedInUser?) {
         this.user = loggedInUser
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore

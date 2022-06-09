@@ -1,13 +1,11 @@
 package com.team12.fruitwatch.ui.main.fragments.home
 
-import android.R.attr.bitmap
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.TypedValue
@@ -22,12 +20,11 @@ import com.team12.fruitwatch.R
 import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.databinding.FragmentHomeBinding
 import com.team12.fruitwatch.ui.dialog.NutritionDialog
+import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 import java.io.*
 import java.text.DecimalFormat
 import java.util.*
@@ -55,6 +52,7 @@ class HomeFragment : Fragment() {
         var storeName: String = String()
         var price: Double = 0.00
         var unit: String = String()
+        var date: String = String()
     }
 
 
@@ -106,24 +104,24 @@ class HomeFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data!!.extras!!.get("data") as Bitmap
             itemImg.setImageBitmap(imageBitmap)
-            val imgPath = saveToInternalStorage(imageBitmap, "searchImage.png")
             uiScope.launch {
-                makeNetworkCall(imageBitmap,imgPath!!)
+                makeNetworkCall(imageBitmap)
             }
         }
     }
 
-    private fun saveToInternalStorage(bitmapImage: Bitmap, imageName: String): String? {
+    private fun saveToInternalStorage(bitmapImage: Bitmap): File? {
         val cw = ContextWrapper(context)
         // path to /data/data/yourapp/app_data/imageDir
         val directory: File = cw.getDir("search_images", Context.MODE_PRIVATE)
         // Create imageDir
-        val mypath = File(directory, imageName)
+        val mypath = File(directory, "image.png")
         var fos: FileOutputStream? = null
         try {
             fos = FileOutputStream(mypath)
             // Use the compress method on the BitMap object to write image to the OutputStream
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            return mypath
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         } finally {
@@ -133,47 +131,41 @@ class HomeFragment : Fragment() {
                 e.printStackTrace()
             }
         }
-        return directory.absolutePath
+        return null
     }
 
-    private fun makeNetworkCall(imageBitmap: Bitmap, imgPath:String) {
-
+    private fun makeNetworkCall(imageBitmap: Bitmap) {
+        val imageFile = saveToInternalStorage(imageBitmap)
         GlobalScope.launch(Dispatchers.IO) {
-
-            val bos = ByteArrayOutputStream()
-            imageBitmap.compress(CompressFormat.PNG, 0 /*ignored for PNG*/, bos)
-            val bitmapdata: ByteArray = bos.toByteArray()
-            val bs = ByteArrayInputStream(bitmapdata)
             //val result: JSONObject = NetworkRequestController().makeServerRequest(bs,imgPath)
-            val result = NetworkRequestController().makeServerRequest(bs,imgPath)
+            val result = NetworkRequestController().startSearch(MainActivity.userInfo,imageFile!!)
 
             GlobalScope.launch(Dispatchers.Main) {
 //                val resultPrices: JSONArray =
 //                    result.getJSONObject("prices").optJSONArray("stores")!!
 //                val resultNutrition: JSONArray =
 //                    result.getJSONObject("nutrition").optJSONArray("items")!!
-                val fruitName = result.trimEnd()
+                val fruitName = result.name
                 updateSearchResultFields(fruitName)
 
-//                if (resultPrices.length() > 0) {
-//                    noResultsTV.visibility = View.GONE
-//                    pricesTblLay.visibility = View.VISIBLE
-//                    resultLayout.visibility = View.VISIBLE
-//                    loadPricesData(resultPrices)
-//                } else {
-//                    resultLayout.visibility = View.GONE
-//                    pricesTblLay.visibility = View.GONE
-//                    noResultsTV.visibility = View.VISIBLE
-//                }
-//
-//                if (resultNutrition.length() > 0) {
-//
-//                    viewNutritionBtn.visibility = View.VISIBLE
-//                    nutritionDialog =
-//                        NutritionDialog(requireContext(), imageBitmap, resultNutrition)
-//                } else {
-//                    viewNutritionBtn.visibility = View.GONE
-//                }
+                if(result.prices != null){
+                if (result.prices.isNotEmpty()) {
+                    noResultsTV.visibility = View.GONE
+                    pricesTblLay.visibility = View.VISIBLE
+                    resultLayout.visibility = View.VISIBLE
+                    loadPricesData(result.prices)
+                } else {
+                    resultLayout.visibility = View.GONE
+                    pricesTblLay.visibility = View.GONE
+                    noResultsTV.visibility = View.VISIBLE
+                }
+                }
+                if (result.calories != "") {
+                    viewNutritionBtn.visibility = View.VISIBLE
+                    nutritionDialog = NutritionDialog(requireContext(), imageBitmap, result)
+                } else {
+                    viewNutritionBtn.visibility = View.GONE
+                }
             }
         }
     }
@@ -183,20 +175,22 @@ class HomeFragment : Fragment() {
         predFruitNameTV.text = fruitName
     }
 
-    private fun processPrices(resultPrices: JSONArray): Array<PriceData?> {
-        val data: Array<PriceData?> = arrayOfNulls(resultPrices.length())
-        for (i in 0 until resultPrices.length()) {
-            val jsonObject = resultPrices.getJSONObject(i)
+    private fun processPrices(resultPrices: List<NetworkRequestController.StorePrice>): Array<PriceData?> {
+        val data: Array<PriceData?> = arrayOfNulls(resultPrices.size)
+        var count = 0
+        for (storePrice in resultPrices) {
             val row = PriceData()
-            row.storeName = jsonObject.getString("name")
-            row.price = jsonObject.getDouble("price")
-            row.unit = jsonObject.getString("unit")
-            data[i] = row
+            row.storeName = storePrice.store
+            row.price = storePrice.price.toDouble()
+            row.unit = storePrice.quantity!!
+            row.date = storePrice.date
+            data[count] = row
+            count += 1
         }
         return data
     }
 
-    private fun loadPricesData(resultPrices: JSONArray) {
+    private fun loadPricesData(resultPrices: List<NetworkRequestController.StorePrice>?) {
         val horizontalRowMargin = resources.getDimension(R.dimen.margin_sm).toInt()
         val verticalRowPadding = resources.getDimension(R.dimen.padding_sm).toInt()
         val horizontalRowPadding = resources.getDimension(R.dimen.padding_lg).toInt()
@@ -205,7 +199,7 @@ class HomeFragment : Fragment() {
         val storeTextSize = resources.getDimension(R.dimen.font_size_xl).toInt()
         val priceTextSize = resources.getDimension(R.dimen.font_size_lg).toInt()
 
-        val data: Array<PriceData?> = processPrices(resultPrices)
+        val data: Array<PriceData?> = processPrices(resultPrices!!)
         val decimalFormat = DecimalFormat("$0.00")
         val rows = data.size
         pricesTblLay.removeAllViews()
@@ -251,7 +245,7 @@ class HomeFragment : Fragment() {
 
             storePrice.text = String.format(
                 Locale.getDefault(),
-                "%s p/%s",
+                "%s %s",
                 decimalFormat.format(row.price),
                 row.unit
             )
@@ -281,3 +275,4 @@ class HomeFragment : Fragment() {
         }
     }
 }
+

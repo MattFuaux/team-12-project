@@ -7,21 +7,32 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.databinding.ActivityLoginBinding
 import com.team12.fruitwatch.ui.main.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var firstname: EditText
+    private lateinit var surname: EditText
+    private lateinit var confirmPassword: EditText
+    private lateinit var login: Button
+    private lateinit var layoutTgl: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,10 +40,19 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val username = binding.username
+        firstname = binding.firstname
+        surname = binding.surname
+        val email = binding.email
         val password = binding.password
-        val login = binding.login
+        confirmPassword = binding.confirmPassword
+        login = binding.login
         val loading = binding.loading
+        layoutTgl = binding.layoutTgl
+
+        layoutTgl.setOnCheckedChangeListener { buttonView, isChecked ->
+            layoutToggle(isChecked)
+        }
+        layoutToggle(false)
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -40,11 +60,11 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
 
-            // disable login button unless both username / password is valid
+            // disable login button unless both email / password is valid
             login.isEnabled = loginState.isDataValid
 
-            if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
+            if (loginState.emailError != null) {
+                email.error = getString(loginState.emailError)
             }
             if (loginState.passwordError != null) {
                 password.error = getString(loginState.passwordError)
@@ -66,9 +86,9 @@ class LoginActivity : AppCompatActivity() {
             }
         })
 
-        username.afterTextChanged {
+        email.afterTextChanged {
             loginViewModel.loginDataChanged(
-                username.text.toString(),
+                email.text.toString(),
                 password.text.toString()
             )
         }
@@ -76,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
         password.apply {
             afterTextChanged {
                 loginViewModel.loginDataChanged(
-                    username.text.toString(),
+                    email.text.toString(),
                     password.text.toString()
                 )
             }
@@ -84,22 +104,60 @@ class LoginActivity : AppCompatActivity() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
-                            username.text.toString(),
-                            password.text.toString()
-                        )
+                        CoroutineScope(Dispatchers.IO).async {
+                            loginViewModel.login(
+                                email.text.toString(),
+                                password.text.toString()
+                            )
+                        }
                 }
                 false
             }
 
+            firstname.apply {
+                afterTextChanged {
+                    if(layoutTgl.isChecked) {
+                        loginViewModel.registrationDataChanged(firstname.text.toString(),surname.text.toString(),email.text.toString(),password.text.toString(),confirmPassword.text.toString())
+                    }
+                }
+            }
+            surname.apply {
+                afterTextChanged {
+                    if(layoutTgl.isChecked) {
+                        loginViewModel.registrationDataChanged(firstname.text.toString(),surname.text.toString(),email.text.toString(),password.text.toString(),confirmPassword.text.toString())
+                    }
+                }
+            }
+            confirmPassword.apply {
+                afterTextChanged {
+                    if(layoutTgl.isChecked) {
+                        loginViewModel.registrationDataChanged(firstname.text.toString(),surname.text.toString(),email.text.toString(),password.text.toString(),confirmPassword.text.toString())
+                    }
+                }
+            }
+
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+
+                if(layoutTgl.isChecked) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        loginViewModel.register(firstname.text.toString(),surname.text.toString(),email.text.toString(),password.text.toString())
+                    }
+                }else{
+                    CoroutineScope(Dispatchers.Main).launch {
+                        loginViewModel.login(email.text.toString(), password.text.toString())
+                    }
+                }
+                loading.visibility = View.INVISIBLE
             }
         }
         if (MainActivity.IN_DEVELOPMENT) {
-            username.text = Editable.Factory.getInstance().newEditable("janedoe@mailbox.com")
-            password.text = Editable.Factory.getInstance().newEditable("janedoe")
+            email.text = Editable.Factory.getInstance().newEditable("janetdoe@mailbox.com")
+            password.text = Editable.Factory.getInstance().newEditable("janetdoe")
+
+            firstname.text = Editable.Factory.getInstance().newEditable("janet")
+            surname.text = Editable.Factory.getInstance().newEditable("doe")
+            confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
     }
 
@@ -113,12 +171,26 @@ class LoginActivity : AppCompatActivity() {
             Toast.LENGTH_LONG
         ).show()
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("USER_KEY", LoggedInUser("1", model.displayName))
+        intent.putExtra("USER_KEY", LoggedInUser(model.userId, model.displayName,model.jwt))
         startActivity(intent)
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun layoutToggle(showRegistrationLayout: Boolean){
+        if(showRegistrationLayout) {
+            firstname.visibility = View.VISIBLE
+            surname.visibility = View.VISIBLE
+            confirmPassword.visibility = View.VISIBLE
+            login.text = getText(R.string.action_register_and_sign_in)
+        }else{
+                firstname.visibility = View.INVISIBLE
+                surname.visibility = View.INVISIBLE
+                confirmPassword.visibility = View.INVISIBLE
+            login.text = getText(R.string.action_sign_in)
+        }
     }
 }
 
