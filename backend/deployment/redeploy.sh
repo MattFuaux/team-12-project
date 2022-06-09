@@ -1,8 +1,8 @@
 #! /bin/bash
 
 # ensure we are in the correct branch
-echo "Checking out working-on-ubuntu-branch2.."
-git checkout working-on-ubuntu2
+echo "Checking out main branch"
+git checkout main
 
 # pull latest
 echo "Pulling latest.."
