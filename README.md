@@ -7,6 +7,12 @@
 - `machine_learning` folder contains the neural network training notebook used, pre-trained fruit prediction model and information about the datasets.
 - `scraper` folder contains scraping script written in Python to scrape fruit prices (Currently only scrapes Coles).
 
+## Production Server Address
+
+http://54.253.79.220:8080
+
+e.g http://54.253.79.220:8080/search to use the search endpoint. Complete list of endpoints are described in the `/backend` folder/
+
 ## Server Setup
 
 The FruitWatch API server is hosted in AWS and is running on an EC2 `t2.medium` instance using an Ubuntu `20.04 LTS` image.
