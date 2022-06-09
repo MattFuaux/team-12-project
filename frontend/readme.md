@@ -7,7 +7,7 @@ The Fruit Watch Android app is simply used as a frontend for the Fruit Watch pro
 The Fruit Watch Android app is just a frontend. It does not process the image used to initiate the search, nor does it actually conduct the search for the item.
 
 ## Implemented Features (but currently untested)
-- Basic Authentication
+- Full Authentication (Registration, Login and Logout)
 - Navigation through various screens (Home, History, Settings)
 - Ability to start a search by taking a picture
 - Ability to show search results to the screen (Dummy Data currently used)
@@ -15,6 +15,5 @@ The Fruit Watch Android app is just a frontend. It does not process the image us
 
 ## Not Implemented Features
 - Settings 
-- Full Authentication
 - Search History List
 - UI Finer details (Animations, etc)
