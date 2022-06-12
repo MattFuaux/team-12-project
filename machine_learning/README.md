@@ -2,29 +2,64 @@
 
 Author: Marck Munoz
 
-This directory contains the files for the convolutional neural network used to train our fruit classification model (`cnn.ipynb`), training datasets information, a pre-trained model we have trained ourselves (`fruit_model.h5`) and prediction script (`predict.py`) which is being utilized by the backend Golang code.
+This directory contains the files for the convolutional neural network used to train our fruit classification model (`cnn.ipynb`), training datasets information, a pre-trained model we have trained ourselves (`fruit_model_30.h5`) and prediction script (`predict.py`) which is being utilized by the backend Golang code.
 
 What is a CNN? https://www.ibm.com/cloud/learn/convolutional-neural-networks
 
 ## Dataset
 
-The following dataset was used to train this CNN: https://www.kaggle.com/sshikamaru/fruit-recognition
+- The following dataset was modified (i.e removed some categories and added more images per category) to train this CNN: https://www.kaggle.com/sshikamaru/fruit-recognition
 
-It contains 33 different classes of fruits and a total of 22495 images.
+- Our final pre-trained model consists of 30 different classfications:
 
-Download the dataset above and place the contents of `archive.zip/train` and `archive.zip/test` inside the `fruits_dataset` folder (create it if it does not exist).
+```
+fruitCategories = {
+	'Apple': 0,
+	'Apricot' : 1,
+	'Avocado' : 2,
+	'Banana' : 3,
+	'Blueberry' : 4,
+	'Cherry' : 5,
+	'Coconut' : 6,
+	'Corn' : 7,
+	'Dragonfruit' : 8,
+	'Durian' : 9,
+	'Eggplant' : 10,
+	'Grapes' : 11,
+	'Kiwi' : 12,
+	'Kumquats' : 13,
+	'Lemon' : 14,
+	'Limes' : 15,
+	'Lychee' : 16,
+	'Mandarin' : 17,
+	'Mango' : 18,
+	'Orange' : 19,
+	'Papaya' : 20,
+	'Passion Fruit' : 21,
+	'Peach' : 22,
+	'Pear' : 23,
+	'Pineapple' : 24,
+	'Pomegranate' : 25,
+	'Raspberry' : 26,
+	'Strawberry' : 27,
+	'Tomato' : 28,
+	'Watermelon' : 29,
+	}
+```
 
 ## Running the CNN and training the model
 
-1. Whilst not required, I recommend installing Anaconda Distribution [https://www.anaconda.com/products/distribution] to manage your python environments. Otherwise you can try and run the the notebook locally without Anaconda or by using Google Colab.
+1. Place training and validation dataset inside a folder.
 
-2. Once Anaconda is installed, create a new Anaconda environment. See https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+2. Whilst not required, I recommend installing Anaconda Distribution [https://www.anaconda.com/products/distribution] to manage your python environments. Otherwise you can try and run the the notebook locally without Anaconda or by using Google Colab.
+
+3. Once Anaconda is installed, create a new Anaconda environment. See https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
 
 `conda create -n myenv python=3.7`
 
 The python version can optionally be specified.
 
-3. Install Jupyter Notebook in your Anaconda environment and open the notebook `cnn.ipynb`
+4. Install Jupyter Notebook in your Anaconda environment and open the notebook `cnn.ipynb`
 
 Tested on Jupyter Notebook and Anaconda Environment using the following dependency versions:
 
