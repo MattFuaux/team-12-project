@@ -71,7 +71,7 @@ def predict(prediction_image):
 
 
 # Load trained model
-model = keras.models.load_model(FILENAME_PREFIX+'/fruit_model.h5')
+model = keras.models.load_model(FILENAME_PREFIX+'/fruit_model_30.h5')
 
 # test_image = 'corn.jpg'
 # The uploaded image's location is passed as an argument to this script.
