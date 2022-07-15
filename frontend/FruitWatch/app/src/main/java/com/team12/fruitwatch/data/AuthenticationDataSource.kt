@@ -2,6 +2,7 @@ package com.team12.fruitwatch.data
 
 import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.data.model.LoggedInUser
+import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.*
 import java.io.IOException
 
@@ -12,6 +13,9 @@ class AuthenticationDataSource {
 
     suspend fun login(email: String, password: String): Result<LoggedInUser> {
         return withContext(Dispatchers.IO){
+            if(MainActivity.IN_DEVELOPMENT){
+                return@withContext Result.Success(LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe","jwt") as LoggedInUser)
+            }
             try {
                 // TODO: handle loggedInUser authentication
                 val networkRequestController = NetworkRequestController()
@@ -20,7 +24,7 @@ class AuthenticationDataSource {
                     return@withContext Result.Success(response.data as LoggedInUser)
                 }
                 throw Exception()
-                //val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe","jwt")
+
             } catch (e: Exception) {
                 return@withContext Result.Error(IOException("Error logging in", e))
             }

@@ -1,12 +1,19 @@
 package com.team12.fruitwatch.ui.main
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -45,6 +52,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (!intent.hasExtra("USER_KEY")) {
             throw Exception()
         }
+        checkCameraPermissions(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -126,5 +134,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    fun checkCameraPermissions(context: Context?) {
+        if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Permission is not granted
+            Log.d("checkCameraPermissions", "No Camera Permissions")
+            ActivityCompat.requestPermissions(
+                (context as Activity?)!!, arrayOf(Manifest.permission.CAMERA),
+                100
+            )
+        }
     }
 }
