@@ -5,9 +5,9 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.provider.MediaStore
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -19,21 +19,21 @@ import androidx.lifecycle.ViewModelProvider
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.databinding.FragmentHomeBinding
+import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.dialog.NutritionDialog
 import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.*
+import java.io.File
 import java.text.DecimalFormat
 import java.util.*
-
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-    private val REQUEST_IMAGE_CAPTURE = 2242
+
     private lateinit var pricesTblLay: TableLayout
     lateinit var itemImg: ImageView
     lateinit var resultLayout: LinearLayout
@@ -42,6 +42,9 @@ class HomeFragment : Fragment() {
     lateinit var viewNutritionBtn: Button
     private var nutritionDialog: NutritionDialog? = null
 
+    companion object{
+        val REQUEST_IMAGE_CAPTURE = 2242
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -91,54 +94,45 @@ class HomeFragment : Fragment() {
     }
 
     private fun dispatchTakePictureIntent() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        //val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val takePictureIntent = Intent(activity, CameraActivity::class.java)
         try {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         } catch (e: ActivityNotFoundException) {
             // display error state to the user
+            Log.d("HomeFragment","Activity Not Found ${e.toString()}")
         }
     }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val imageBitmap = data!!.extras!!.get("data") as Bitmap
-            itemImg.setImageBitmap(imageBitmap)
+        if (resultCode == RESULT_OK) {
+            val imageFile = getSavedImageFileFromInternalStorage()
+
+            itemImg.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
             uiScope.launch {
-                makeNetworkCall(imageBitmap)
+                makeNetworkCall(imageFile)
             }
+        }
+        else if (resultCode == CameraActivity.RESULT_FAILED) {
+            Log.d("HomeFragment","No camera attached on device")
+            Toast.makeText(context,"No camera detected on device!",Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun saveToInternalStorage(bitmapImage: Bitmap): File? {
+    private fun getSavedImageFileFromInternalStorage(): File {
         val cw = ContextWrapper(context)
         // path to /data/data/yourapp/app_data/imageDir
         val directory: File = cw.getDir("search_images", Context.MODE_PRIVATE)
         // Create imageDir
         val mypath = File(directory, "image.png")
-        var fos: FileOutputStream? = null
-        try {
-            fos = FileOutputStream(mypath)
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos)
-            return mypath
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        } finally {
-            try {
-                fos?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-        return null
+        return mypath
     }
 
-    private fun makeNetworkCall(imageBitmap: Bitmap) {
-        val imageFile = saveToInternalStorage(imageBitmap)
+    private fun makeNetworkCall(imageFile: File) {
         GlobalScope.launch(Dispatchers.IO) {
             //val result: JSONObject = NetworkRequestController().makeServerRequest(bs,imgPath)
-            val result = NetworkRequestController().startSearch(MainActivity.userInfo,imageFile!!)
+            val result = NetworkRequestController().startSearch(MainActivity.userInfo,imageFile)
 
             GlobalScope.launch(Dispatchers.Main) {
 //                val resultPrices: JSONArray =
@@ -162,7 +156,7 @@ class HomeFragment : Fragment() {
                 }
                 if (result.calories != "") {
                     viewNutritionBtn.visibility = View.VISIBLE
-                    nutritionDialog = NutritionDialog(requireContext(), imageBitmap, result)
+                    nutritionDialog = NutritionDialog(requireContext(), BitmapFactory.decodeFile(imageFile.absolutePath), result)
                 } else {
                     viewNutritionBtn.visibility = View.GONE
                 }

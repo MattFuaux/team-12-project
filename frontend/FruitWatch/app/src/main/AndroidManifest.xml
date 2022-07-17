@@ -2,10 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.team12.fruitwatch">
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+
 
     <application
         android:allowBackup="true"
@@ -37,6 +40,13 @@
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="true" />
+        <activity
+            android:name=".ui.camera.CameraActivity"
+            android:exported="false"
+            android:label="CameraActivity"
+            android:screenOrientation="fullSensor">
+        </activity>
+
     </application>
 
 </manifest>
