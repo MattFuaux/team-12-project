@@ -64,7 +64,6 @@ class CameraPreview(
             camera.apply {
                 try {
                     setCameraDisplayOrientation()
-
                     setPreviewDisplay(mHolder)
                     startPreview()
                 } catch (e: Exception) {
