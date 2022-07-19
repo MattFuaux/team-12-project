@@ -37,8 +37,7 @@ class NetworkRequestController {
     private val URL_LOGOUT = "$URL_PREFIX$URL_IP/logout"
     private val URL_SEARCH = "$URL_PREFIX$URL_IP/search"
 
-    private val TEST_JSON_DATA_NUTRITIONAL_INFO = "\"items\":[" +
-            "{" +
+    private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"orange\"," +
             "\"calories\": 73," +
             "\"fat_g\": 0.2," +
@@ -49,34 +48,35 @@ class NetworkRequestController {
             "\"protein_g\": 1.3," +
             "\"vitamin_c_mg\": 82.7," +
             "\"potassium_mg\": 232," +
-            "\"calcium_mg\": 60.2" +
-            "}" +
-            "]"
+            "\"calcium_mg\": 60.2"
 
-    private val TEST_JSON_DATA_SUPERMARKET_PRICES = "\"stores\":[" +
-            "{" +
-            "\"name\": \"ALDI\"," +
+    private val TEST_JSON_DATA_SUPERMARKET_PRICES = "{" +
+            "\"store\": \"ALDI\"," +
             "\"price\": 2.32," +
-            "\"unit\": \"kg\"" +
+            "\"date\": 2022-06-25," +
+            "\"quantity\": \"kg\"" +
             "}," +
             "{" +
-            "\"name\": \"Woolworths\"," +
+            "\"store\": \"Woolworths\"," +
             "\"price\": 2.27," +
-            "\"unit\": \"kg\"" +
+            "\"date\": 2022-06-25," +
+            "\"quantity\": \"kg\"" +
             "}," +
             "{" +
-            "\"name\": \"Coles\"," +
+            "\"store\": \"Coles\"," +
             "\"price\": 2.40," +
-            "\"unit\": \"kg\"" +
-            "}" +
-            "]"
+            "\"date\": 2022-06-25," +
+            "\"quantity\": \"kg\"" +
+            "}"
 
-    private val TEST_JSON_DATA_RESULTS = "{\"prices\":{" +
+
+    private val TEST_JSON_DATA_RESULTS = "{\"prices\":[" +
             TEST_JSON_DATA_SUPERMARKET_PRICES +
-            "}," +
-            "\"nutrition\":{" +
+            "]," +
+//            "\"nutrition\":{" +
             TEST_JSON_DATA_NUTRITIONAL_INFO +
-            "}}"
+//            "}" +
+            "}"
 
     data class ResponseData(
         val statusCode:Int,
@@ -143,13 +143,19 @@ class NetworkRequestController {
         )
 
     fun startSearch(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
-        // Make network/server call here
-        val dataPart: DataPart = FileDataPart(imageToPredict)
-        val response = Fuel.upload(URL_SEARCH,Method.POST).add(dataPart).header(Headers.COOKIE to loggedInUser.jwt).response()
-        val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
-        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
-        val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-        return resultObject
+        return if(!MainActivity.IN_DEVELOPMENT) {
+            // Make network/server call here
+            val dataPart: DataPart = FileDataPart(imageToPredict)
+            val response = Fuel.upload(URL_SEARCH, Method.POST).add(dataPart)
+                .header(Headers.COOKIE to loggedInUser.jwt).response()
+            val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
+            val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+            resultObject
+        }else{
+            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+            val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+            resultObject
+        }
     }
 
     fun registerUser(firstname:String, surname: String, email:String, password: String): ResponseData {
