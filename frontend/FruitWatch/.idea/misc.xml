@@ -3,12 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/drawable/ic_baseline_logout_24.xml" value="0.17" />
         <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.11950732356857523" />
         <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout-w936dp/activity_login.xml" value="0.140234375" />
-        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/activity_login.xml" value="0.18697916666666667" />
-        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/activity_main.xml" value="0.18697916666666667" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/activity_login.xml" value="0.264" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/app_bar_main.xml" value="0.18697916666666667" />
         <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/content_main.xml" value="0.18697916666666667" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/fragment_home.xml" value="0.4" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/nav_header_main.xml" value="0.1" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/layout/nutrition_dialog.xml" value="0.1546875" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/menu/activity_main_drawer.xml" value="0.15372829417773237" />
+        <entry key="..\:/Users/camak/Documents/Projects/University/Team-12-Fruit-Watch/frontend/FruitWatch/app/src/main/res/menu/main.xml" value="0.13703703703703704" />
         <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/glass_background.xml" value="0.382" />
         <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/ic_splash_image.xml" value="0.382" />
         <entry key="..\:/Users/camak/Projects/Android/FruitWatch/app/src/main/res/drawable/splash_gradient.xml" value="0.382" />

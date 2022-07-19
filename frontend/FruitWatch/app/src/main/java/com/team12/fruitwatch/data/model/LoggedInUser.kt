@@ -8,13 +8,15 @@ import android.os.Parcelable
  */
 data class LoggedInUser(
     val userId: String,
-    val displayName: String
+    val displayName: String,
+    val jwt : String
 ) : Parcelable {
-    constructor(parcel: Parcel) : this(parcel.readString()!!, parcel.readString()!!)
+    constructor(parcel: Parcel) : this(parcel.readString()!!, parcel.readString()!!, parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(userId)
         parcel.writeString(displayName)
+        parcel.writeString(jwt)
     }
 
     override fun describeContents(): Int {

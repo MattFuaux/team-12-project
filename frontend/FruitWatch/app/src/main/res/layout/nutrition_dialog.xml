@@ -6,9 +6,9 @@
 
     <ImageView
         android:id="@+id/diag_nutrition_item_img"
-        android:layout_width="match_parent"
+        android:layout_margin="@dimen/margin_lg"
+        android:layout_width="200dp"
         android:layout_height="200dp"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
 
         android:textAlignment="center"
-        android:textSize="@dimen/font_size_md"
+        android:textSize="@dimen/font_size_xl"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +30,8 @@
         android:id="@+id/diag_nutrition_info_tbl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_lg"
+        android:layout_marginBottom="@dimen/margin_lg"
+
         android:layout_marginStart="@dimen/margin_md"
         android:layout_marginEnd="@dimen/margin_md"
         android:paddingLeft="@dimen/padding_md"

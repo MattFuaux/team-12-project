@@ -12,6 +12,15 @@
     android:background="@drawable/splash_gradient"
     tools:context=".ui.login.LoginActivity">
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_sm"
+        android:text="@string/action_show_registration"
+        android:id="@+id/layoutTgl"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,22 +32,52 @@
         android:layout_marginEnd="@dimen/margin_lg"
         android:layout_marginStart="@dimen/margin_lg"
         android:padding="@dimen/padding_lg"
-        android:background="@drawable/glass_background">
+
+        >
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/firstname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="96dp"
-            android:maxWidth="400dp"
-            
-            android:hint="@string/prompt_email"
-            android:inputType="textEmailAddress"
+            android:hint="@string/prompt_firstname"
             android:padding="@dimen/padding_lg"
+            android:inputType="textPersonName"
+            android:visibility="invisible"
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:autofillHints="name" />
+
+        <EditText
+            android:id="@+id/surname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/prompt_surname"
+            android:visibility="invisible"
+            android:padding="@dimen/padding_lg"
+            android:inputType="textPersonName"
+            android:selectAllOnFocus="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/firstname"
+            android:autofillHints="name" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/prompt_email"
+            android:padding="@dimen/padding_lg"
+
+            android:inputType="textEmailAddress"
+            android:selectAllOnFocus="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/surname"
             android:autofillHints="emailAddress" />
 
         <EditText
@@ -46,17 +85,33 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:maxWidth="400dp"
-            
             android:padding="@dimen/padding_lg"
+
             android:hint="@string/prompt_password"
-            android:imeActionLabel="@string/action_sign_in_short"
+            android:imeActionLabel="@string/action_sign_in"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/username"
+            app:layout_constraintTop_toBottomOf="@+id/email"
+            android:autofillHints="password" />
+
+        <EditText
+            android:id="@+id/confirmPassword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="@dimen/padding_lg"
+            android:hint="@string/prompt_confirm_password"
+            android:imeActionLabel="@string/action_sign_in"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:selectAllOnFocus="true"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/password"
             android:autofillHints="password" />
 
         <Button
@@ -71,7 +126,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password"
+            app:layout_constraintTop_toBottomOf="@+id/confirmPassword"
             app:layout_constraintVertical_bias="0.2" />
 
         <ProgressBar

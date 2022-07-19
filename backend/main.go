@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("error: unable to connect to the database.")
 	} else {
-		fmt.Print("Connected to database\n")
+		fmt.Print("Connected to the database.\n")
 	}
 
 	// create new gorilla mux router
@@ -38,7 +38,7 @@ func main() {
 	routes.SetRoutes(r)
 
 	// start http server
-	fmt.Println("FruitWatch server started on port 8080")
+	fmt.Println("FruitWatch server started on port 8080.")
 	log.Fatal(http.ListenAndServe(":8080", r))
 
 }
