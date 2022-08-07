@@ -17,11 +17,20 @@ import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
 import com.team12.fruitwatch.R
+import com.team12.fruitwatch.controllers.NetworkRequestController
+import com.team12.fruitwatch.database.entities.PastSearch
+import com.team12.fruitwatch.database.entitymanager.PastSearchDb
+import com.team12.fruitwatch.ui.main.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.LocalDateTime
 
 
 class CameraActivity : Activity() {
@@ -147,7 +156,6 @@ class CameraActivity : Activity() {
             ExifInterface.ORIENTATION_UNDEFINED
         )
         var bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size)
-
 
         Log.d(TAG, "Orientation: $orientation")
         var processedBitmap: Bitmap? = null

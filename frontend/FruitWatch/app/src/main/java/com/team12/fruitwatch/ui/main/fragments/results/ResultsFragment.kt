@@ -1,10 +1,13 @@
-package com.team12.fruitwatch.ui.main.fragments.home
+package com.team12.fruitwatch.ui.main.fragments.results
 
 import android.app.Activity.RESULT_OK
+
+
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
@@ -18,24 +21,32 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.controllers.NetworkRequestController
-import com.team12.fruitwatch.databinding.FragmentHomeBinding
+
+import com.team12.fruitwatch.database.entities.PastSearch
+import com.team12.fruitwatch.database.entitymanager.PastSearchDb
+import com.team12.fruitwatch.databinding.FragmentResultsBinding
 import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.dialog.NutritionDialog
 import com.team12.fruitwatch.ui.main.MainActivity
+import com.team12.fruitwatch.ui.main.fragments.search.PastSearchItemModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.DecimalFormat
+import java.time.LocalDateTime
 import java.util.*
 
-class HomeFragment : Fragment() {
+class ResultsFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
+    private val TAG = "ResultsFragment"
+    private var _binding: FragmentResultsBinding? = null
 
+    private var pastSearch: PastSearchItemModel? = null
     private lateinit var pricesTblLay: TableLayout
-    lateinit var itemImg: ImageView
+    lateinit var itemImgIV: ImageView
+    var itemImgByteArray: ByteArray? = null
     lateinit var resultLayout: LinearLayout
     lateinit var noResultsTV: TextView
     lateinit var predFruitNameTV: TextView
@@ -64,29 +75,37 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        val resultsViewModel =
+            ViewModelProvider(this).get(ResultsViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //val textView: TextView = binding.
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            //textView.text = it
-        }
-
-        val startSearchBtn = root.findViewById<Button>(R.id.frag_home_take_pic_btn)
+        val startSearchBtn = root.findViewById<Button>(R.id.frag_res_take_pic_btn)
         startSearchBtn.setOnClickListener { dispatchTakePictureIntent() }
-        itemImg = root.findViewById(R.id.frag_home_item_img)
-        resultLayout = root.findViewById(R.id.frag_home_search_result_linlay)
-        noResultsTV = root.findViewById(R.id.frag_home_no_results_tv)
-        predFruitNameTV = root.findViewById(R.id.frag_home_pred_fruit_name)
+        itemImgIV = root.findViewById(R.id.frag_res_item_img)
+        resultLayout = root.findViewById(R.id.frag_res_search_result_linlay)
+        noResultsTV = root.findViewById(R.id.frag_res_no_results_tv)
+        predFruitNameTV = root.findViewById(R.id.frag_res_pred_fruit_name)
 
-        pricesTblLay = root.findViewById(R.id.frag_home_item_prices_tbl)
-        viewNutritionBtn = root.findViewById(R.id.frag_home_view_nutrition_btn)
+        pricesTblLay = root.findViewById(R.id.frag_res_item_prices_tbl)
+        viewNutritionBtn = root.findViewById(R.id.frag_res_view_nutrition_btn)
         viewNutritionBtn.setOnClickListener { nutritionDialog?.show() }
+
+        if (requireArguments().containsKey("PAST_SEARCH_REQUEST")){
+            pastSearch = requireArguments().getParcelable<PastSearchItemModel>("PAST_SEARCH_REQUEST")
+            predFruitNameTV.text = pastSearch!!.itemName
+            itemImgIV.setImageBitmap(pastSearch!!.itemImage)
+        }else{
+            itemImgByteArray = requireArguments().getByteArray("SEARCH_IMAGE")
+            itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
+        }
+        val results = requireArguments().getParcelable<NetworkRequestController.SearchResults>("SEARCH_RESULTS")
+        showSearchResults(results!!)
+
         return root
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -104,21 +123,22 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == RESULT_OK) {
-            val imageFile = getSavedImageFileFromInternalStorage()
-
-            itemImg.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
-            uiScope.launch {
-                makeNetworkCall(imageFile)
-            }
-        }
-        else if (resultCode == CameraActivity.RESULT_FAILED) {
-            Log.d("HomeFragment","No camera attached on device")
-            Toast.makeText(context,"No camera detected on device!",Toast.LENGTH_LONG).show()
-        }
-    }
+//    @Deprecated("Deprecated in Java")
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (resultCode == RESULT_OK) {
+//            val imageFile = getSavedImageFileFromInternalStorage()
+//
+//            itemImg.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
+//            // TODO: Add loading wheel while waiting for network activity
+//            uiScope.launch {
+//                prepareSearchRequestWithImage(imageFile)
+//            }
+//        }
+//        else if (resultCode == CameraActivity.RESULT_FAILED) {
+//            Log.d("HomeFragment","No camera attached on device")
+//            Toast.makeText(context,"No camera detected on device!",Toast.LENGTH_LONG).show()
+//        }
+//    }
 
     private fun getSavedImageFileFromInternalStorage(): File {
         val cw = ContextWrapper(context)
@@ -129,38 +149,32 @@ class HomeFragment : Fragment() {
         return mypath
     }
 
-    private fun makeNetworkCall(imageFile: File) {
-        GlobalScope.launch(Dispatchers.IO) {
-            //val result: JSONObject = NetworkRequestController().makeServerRequest(bs,imgPath)
-            val result = NetworkRequestController().startSearch(MainActivity.userInfo,imageFile)
+    private fun showSearchResults(result: NetworkRequestController.SearchResults){
+        val fruitName = result.name
+        updateSearchResultFields(fruitName)
 
-            GlobalScope.launch(Dispatchers.Main) {
-//                val resultPrices: JSONArray =
-//                    result.getJSONObject("prices").optJSONArray("stores")!!
-//                val resultNutrition: JSONArray =
-//                    result.getJSONObject("nutrition").optJSONArray("items")!!
-                val fruitName = result.name
-                updateSearchResultFields(fruitName)
-
-                if(result.prices != null){
-                if (result.prices.isNotEmpty()) {
-                    noResultsTV.visibility = View.GONE
-                    pricesTblLay.visibility = View.VISIBLE
-                    resultLayout.visibility = View.VISIBLE
-                    loadPricesData(result.prices)
-                } else {
-                    resultLayout.visibility = View.GONE
-                    pricesTblLay.visibility = View.GONE
-                    noResultsTV.visibility = View.VISIBLE
-                }
-                }
-                if (result.calories != "") {
-                    viewNutritionBtn.visibility = View.VISIBLE
-                    nutritionDialog = NutritionDialog(requireContext(), BitmapFactory.decodeFile(imageFile.absolutePath), result)
-                } else {
-                    viewNutritionBtn.visibility = View.GONE
-                }
+        if(result.prices != null){
+            if (result.prices.isNotEmpty()) {
+                noResultsTV.visibility = View.GONE
+                pricesTblLay.visibility = View.VISIBLE
+                resultLayout.visibility = View.VISIBLE
+                loadPricesData(result.prices)
+            } else {
+                resultLayout.visibility = View.GONE
+                pricesTblLay.visibility = View.GONE
+                noResultsTV.visibility = View.VISIBLE
             }
+        }
+        if (result.calories != "") {
+            viewNutritionBtn.visibility = View.VISIBLE
+            if(pastSearch != null){
+                nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage, result)
+            }else{
+                nutritionDialog = NutritionDialog(requireContext(), BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size), result)
+            }
+
+        } else {
+            viewNutritionBtn.visibility = View.GONE
         }
     }
 

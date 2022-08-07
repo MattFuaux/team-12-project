@@ -2,6 +2,7 @@ package com.team12.fruitwatch.controllers
 
 
 import android.graphics.Bitmap
+import android.os.Parcelable
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
@@ -16,6 +17,7 @@ import com.google.gson.annotations.SerializedName
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.*
+import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.DataOutputStream
@@ -36,6 +38,7 @@ class NetworkRequestController {
     private val URL_LOGIN = "$URL_PREFIX$URL_IP/authenticate"
     private val URL_LOGOUT = "$URL_PREFIX$URL_IP/logout"
     private val URL_SEARCH = "$URL_PREFIX$URL_IP/search"
+    private val URL_RE_SEARCH = "$URL_PREFIX$URL_IP/research"
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"orange\"," +
@@ -102,12 +105,13 @@ class NetworkRequestController {
         val password:String
         )
 
+    @Parcelize
     data class StorePrice(
         val store:String,
         val price:String,
         val quantity:String?,
         val date:String
-        )
+        ) : Parcelable
 
     data class ItemNutrition(
         val name:String?,
@@ -123,6 +127,7 @@ class NetworkRequestController {
         val sodium_mg:String?,
         val sugar_g:String?
         )
+    @Parcelize
     data class SearchResults(
         @SerializedName("prices")
         val prices: List<StorePrice>?,
@@ -140,9 +145,25 @@ class NetworkRequestController {
         val serving_size_g:String?,
         val sodium_mg:String?,
         val sugar_g:String?
-        )
+        ) : Parcelable
 
-    fun startSearch(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
+    fun startSearchWithItemName(loggedInUser: LoggedInUser, itemNameToSearch: String): SearchResults {
+        return if(!MainActivity.IN_DEVELOPMENT) {
+            // Make network/server call here
+            val parameters = listOf<Pair<String,Any?>>(Pair("itemName",itemNameToSearch))
+            val response = Fuel.post(URL_RE_SEARCH, parameters)
+                .header(Headers.COOKIE to loggedInUser.jwt).response()
+            val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
+            val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+            resultObject
+        }else{
+            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+            val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+            resultObject
+        }
+    }
+
+    fun startSearchWithImage(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
         return if(!MainActivity.IN_DEVELOPMENT) {
             // Make network/server call here
             val dataPart: DataPart = FileDataPart(imageToPredict)
