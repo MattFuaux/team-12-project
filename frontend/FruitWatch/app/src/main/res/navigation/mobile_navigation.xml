@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_search">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.team12.fruitwatch.ui.main.fragments.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_search"
+        android:name="com.team12.fruitwatch.ui.main.fragments.search.SearchFragment"
+        android:label="@string/menu_search"
+        tools:layout="@layout/fragment_search" />
 
     <fragment
-        android:id="@+id/nav_history"
-        android:name="com.team12.fruitwatch.ui.main.fragments.history.HistoryFragment"
-        android:label="@string/menu_history"
-        tools:layout="@layout/fragment_history" />
+        android:id="@+id/nav_results"
+        android:name="com.team12.fruitwatch.ui.main.fragments.results.ResultsFragment"
+        android:label="@string/menu_results"
+        tools:layout="@layout/fragment_results" />
 
 </navigation>

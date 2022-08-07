@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.fragments.home.HomeFragment">
+    tools:context=".ui.main.fragments.results.ResultsFragment">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:id="@+id/frag_home_item_img"
+        android:id="@+id/frag_res_item_img"
         android:src="@drawable/no_image_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,21 +18,21 @@
 
 
     <Button
-        android:id="@+id/frag_home_take_pic_btn"
+        android:id="@+id/frag_res_take_pic_btn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_2xl"
         android:layout_marginEnd="@dimen/margin_2xl"
         android:textAlignment="center"
         android:textSize="@dimen/font_size_md"
-        android:text="@string/start_search"
+        android:text="@string/start_search_small"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_item_img" />
+        app:layout_constraintTop_toBottomOf="@+id/frag_res_item_img" />
 
     <TextView
-        android:id="@+id/frag_home_pred_fruit_name"
+        android:id="@+id/frag_res_pred_fruit_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_lg"
@@ -42,11 +42,11 @@
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn"
+        app:layout_constraintTop_toBottomOf="@+id/frag_res_take_pic_btn"
          />
 
     <TextView
-        android:id="@+id/frag_home_no_results_tv"
+        android:id="@+id/frag_res_no_results_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/font_size_md"
@@ -55,11 +55,11 @@
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_pred_fruit_name"
+        app:layout_constraintTop_toBottomOf="@+id/frag_res_pred_fruit_name"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <LinearLayout
-        android:id="@+id/frag_home_search_result_linlay"
+        android:id="@+id/frag_res_search_result_linlay"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
@@ -68,11 +68,11 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frag_home_pred_fruit_name"
+        app:layout_constraintTop_toBottomOf="@+id/frag_res_pred_fruit_name"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/frag_home_view_nutrition_btn"
+            android:id="@+id/frag_res_view_nutrition_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_2xl"
@@ -83,11 +83,11 @@
             style="@style/OrangeButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frag_home_take_pic_btn" />
+            app:layout_constraintTop_toBottomOf="@+id/frag_res_take_pic_btn" />
 
 
         <TextView
-            android:id="@+id/frag_home_item_title"
+            android:id="@+id/frag_res_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_md"
@@ -101,7 +101,7 @@
             />
 
         <TableLayout
-            android:id="@+id/frag_home_item_prices_tbl"
+            android:id="@+id/frag_res_item_prices_tbl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_lg"

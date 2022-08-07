@@ -1,13 +1,13 @@
-package com.team12.fruitwatch.ui.main.fragments.history
+package com.team12.fruitwatch.ui.main.fragments.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HistoryViewModel : ViewModel() {
+class SearchViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is gallery Fragment"
+        value = "This is search Fragment"
     }
     val text: LiveData<String> = _text
 }
