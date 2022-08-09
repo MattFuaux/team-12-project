@@ -1,14 +1,11 @@
 package com.team12.fruitwatch.ui.main.fragments.results
 
-import android.app.Activity.RESULT_OK
-
 
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -21,21 +18,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.controllers.NetworkRequestController
-
 import com.team12.fruitwatch.database.entities.PastSearch
-import com.team12.fruitwatch.database.entitymanager.PastSearchDb
 import com.team12.fruitwatch.databinding.FragmentResultsBinding
 import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.dialog.NutritionDialog
-import com.team12.fruitwatch.ui.main.MainActivity
-import com.team12.fruitwatch.ui.main.fragments.search.PastSearchItemModel
+import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.File
 import java.text.DecimalFormat
-import java.time.LocalDateTime
 import java.util.*
 
 class ResultsFragment : Fragment() {
@@ -43,7 +34,7 @@ class ResultsFragment : Fragment() {
     private val TAG = "ResultsFragment"
     private var _binding: FragmentResultsBinding? = null
 
-    private var pastSearch: PastSearchItemModel? = null
+    private var pastSearch: PastSearch? = null
     private lateinit var pricesTblLay: TableLayout
     lateinit var itemImgIV: ImageView
     var itemImgByteArray: ByteArray? = null
@@ -52,6 +43,8 @@ class ResultsFragment : Fragment() {
     lateinit var predFruitNameTV: TextView
     lateinit var viewNutritionBtn: Button
     private var nutritionDialog: NutritionDialog? = null
+    lateinit var viewPastSearchesBtn: Button
+
 
     companion object{
         val REQUEST_IMAGE_CAPTURE = 2242
@@ -75,8 +68,7 @@ class ResultsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val resultsViewModel =
-            ViewModelProvider(this).get(ResultsViewModel::class.java)
+        val resultsViewModel = ViewModelProvider(this).get(ResultsViewModel::class.java)
 
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -84,18 +76,20 @@ class ResultsFragment : Fragment() {
         val startSearchBtn = root.findViewById<Button>(R.id.frag_res_take_pic_btn)
         startSearchBtn.setOnClickListener { dispatchTakePictureIntent() }
         itemImgIV = root.findViewById(R.id.frag_res_item_img)
-        resultLayout = root.findViewById(R.id.frag_res_search_result_linlay)
+        //resultLayout = root.findViewById(R.id.frag_res_search_result_linlay)
         noResultsTV = root.findViewById(R.id.frag_res_no_results_tv)
         predFruitNameTV = root.findViewById(R.id.frag_res_pred_fruit_name)
 
         pricesTblLay = root.findViewById(R.id.frag_res_item_prices_tbl)
+        viewPastSearchesBtn = root.findViewById(R.id.frag_res_view_past_searches_btn)
+        viewPastSearchesBtn.setOnClickListener(){(requireActivity() as FragmentDataLink).openSearchFrag()}
         viewNutritionBtn = root.findViewById(R.id.frag_res_view_nutrition_btn)
         viewNutritionBtn.setOnClickListener { nutritionDialog?.show() }
 
         if (requireArguments().containsKey("PAST_SEARCH_REQUEST")){
-            pastSearch = requireArguments().getParcelable<PastSearchItemModel>("PAST_SEARCH_REQUEST")
+            pastSearch = requireArguments().getParcelable<PastSearch>("PAST_SEARCH_REQUEST")
             predFruitNameTV.text = pastSearch!!.itemName
-            itemImgIV.setImageBitmap(pastSearch!!.itemImage)
+            itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(pastSearch!!.itemImage,0,pastSearch!!.itemImage!!.size))
         }else{
             itemImgByteArray = requireArguments().getByteArray("SEARCH_IMAGE")
             itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
@@ -109,6 +103,7 @@ class ResultsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        requireArguments().clear()
         _binding = null
     }
 
@@ -123,30 +118,12 @@ class ResultsFragment : Fragment() {
         }
     }
 
-//    @Deprecated("Deprecated in Java")
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if (resultCode == RESULT_OK) {
-//            val imageFile = getSavedImageFileFromInternalStorage()
-//
-//            itemImg.setImageBitmap(BitmapFactory.decodeFile(imageFile.absolutePath))
-//            // TODO: Add loading wheel while waiting for network activity
-//            uiScope.launch {
-//                prepareSearchRequestWithImage(imageFile)
-//            }
-//        }
-//        else if (resultCode == CameraActivity.RESULT_FAILED) {
-//            Log.d("HomeFragment","No camera attached on device")
-//            Toast.makeText(context,"No camera detected on device!",Toast.LENGTH_LONG).show()
-//        }
-//    }
-
-    private fun getSavedImageFileFromInternalStorage(): File {
-        val cw = ContextWrapper(context)
+    /** Create a File for saving an image or video */
+    private fun getOutputImageFile(): File {
         // path to /data/data/yourapp/app_data/imageDir
-        val directory: File = cw.getDir("search_images", Context.MODE_PRIVATE)
+        val directory: File = requireContext().getDir("search_images", Context.MODE_PRIVATE)
         // Create imageDir
-        val mypath = File(directory, "image.png")
-        return mypath
+        return File(directory, "image.png")
     }
 
     private fun showSearchResults(result: NetworkRequestController.SearchResults){
@@ -157,10 +134,9 @@ class ResultsFragment : Fragment() {
             if (result.prices.isNotEmpty()) {
                 noResultsTV.visibility = View.GONE
                 pricesTblLay.visibility = View.VISIBLE
-                resultLayout.visibility = View.VISIBLE
                 loadPricesData(result.prices)
             } else {
-                resultLayout.visibility = View.GONE
+
                 pricesTblLay.visibility = View.GONE
                 noResultsTV.visibility = View.VISIBLE
             }
@@ -168,9 +144,9 @@ class ResultsFragment : Fragment() {
         if (result.calories != "") {
             viewNutritionBtn.visibility = View.VISIBLE
             if(pastSearch != null){
-                nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage, result)
+                nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage!!, result)
             }else{
-                nutritionDialog = NutritionDialog(requireContext(), BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size), result)
+                nutritionDialog = NutritionDialog(requireContext(), itemImgByteArray!!, result)
             }
 
         } else {
@@ -220,7 +196,7 @@ class ResultsFragment : Fragment() {
             storeName.setTextSize(TypedValue.COMPLEX_UNIT_PX, storeTextSize.toFloat())
             storeName.layoutParams = TableRow.LayoutParams(
                 TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT
+                TableRow.LayoutParams.MATCH_PARENT
             )
 
             storeName.gravity = Gravity.CENTER
@@ -258,13 +234,35 @@ class ResultsFragment : Fragment() {
                 row.unit
             )
 
+            val nearbyBtn = Button(context)
+            nearbyBtn.text = "Find\nNearby"
+            nearbyBtn.gravity = Gravity.CENTER
+            nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
+//            nearbyBtn.setPadding(
+//                horizontalRowPadding,
+//                verticalRowPadding,
+//                horizontalEndStorePadding,
+//                verticalRowPadding
+//            )
+            nearbyBtn.setOnClickListener(){
+                val gmmIntentUri: Uri = Uri.parse("geo:0,0?q=${row.storeName}")
+                // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                // Make the Intent explicit by setting the Google Maps package
+                mapIntent.setPackage("com.google.android.apps.maps")
+
+                // Attempt to start an activity that can handle the Intent
+                startActivity(mapIntent)
+            }
+
+
             // add table row
             val tableRow = TableRow(context)
             tableRow.gravity = Gravity.CENTER
             tableRow.id = i + 1
             val tableRowParams = TableLayout.LayoutParams(
                 TableLayout.LayoutParams.MATCH_PARENT,
-                TableLayout.LayoutParams.WRAP_CONTENT
+                TableLayout.LayoutParams.MATCH_PARENT
             )
             tableRowParams.setMargins(
                 horizontalRowMargin, 0, horizontalRowMargin,
@@ -279,8 +277,10 @@ class ResultsFragment : Fragment() {
             tableRow.layoutParams = tableRowParams
             tableRow.addView(storeName)
             tableRow.addView(storePrice)
+            tableRow.addView(nearbyBtn)
             pricesTblLay.addView(tableRow, tableRowParams)
         }
     }
+
 }
 

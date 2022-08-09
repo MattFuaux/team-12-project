@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 class PastSearchItemModel( var id: Long? = null,
                            var itemName: String,
                            var itemSearchDate: LocalDateTime,
-                           var itemImage: Bitmap)
+                           var itemImage: ByteArray)
  : ViewModel(), Parcelable {
 
 //    private companion object : Parceler<PastSearchItemModel> {

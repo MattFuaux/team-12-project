@@ -9,23 +9,166 @@
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 
-    <style name="RedButton" parent="Base.Widget.AppCompat.Button">
-        <item name="backgroundTint">@color/red_500</item>
+    <style name="ShapeAppearance.HistoryCard" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
     </style>
 
-    <style name="GreenButton" parent="Base.Widget.AppCompat.Button">
-        <item name="backgroundTint">@color/green_500</item>
+    <style name="SearchButtonLarge" parent="ButtonLargeSquare">
+        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:text">Start New Search</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_search_24</item>
     </style>
 
-    <style name="BlueButton" parent="Base.Widget.AppCompat.Button">
-        <item name="backgroundTint">@color/blue_500</item>
+    <style name="SearchButton" parent="ButtonRegularSquare">
+        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_search_24</item>
     </style>
 
-    <style name="OrangeButton" parent="Base.Widget.AppCompat.Button">
-        <item name="backgroundTint">@color/orange_500</item>
+    <style name="HistoryButton" parent="ButtonRegularSquare">
+        <item name="backgroundTint">@color/tertiaryColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_history_24</item>
     </style>
 
-    <style name="YellowButton" parent="Base.Widget.AppCompat.Button">
-        <item name="backgroundTint">@color/yellow_500</item>
+    <style name="NutritionButton" parent="ButtonRegularSquare">
+        <item name="backgroundTint">@color/deep_purple</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_outline_info_24</item>
     </style>
+
+    <style name="CaptureButton" parent="ButtonRegularSquare">
+        <item name="android:backgroundTint">@color/primaryColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:text">Capture</item>
+        <item name="android:paddingTop">@dimen/padding_lg</item>
+        <item name="android:paddingBottom">@dimen/padding_lg</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableTop">@drawable/ic_menu_camera</item>
+    </style>
+
+    <style name="GoBackButton" parent="ButtonRegularSquare">
+        <item name="android:backgroundTint">@color/primaryLightColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:text">Go Back</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_arrow_back_24</item>
+    </style>
+
+    <style name="CloseButton" parent="ButtonRegularRounded">
+        <item name="backgroundTint">@color/quaternaryDarkColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:text">Close</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_close_24</item>
+    </style>
+
+    <style name="SignInButton" parent="ButtonLargeSquare">
+        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:drawablePadding">@dimen/padding_md</item>
+        <item name="android:drawableLeft">@drawable/ic_baseline_login_24</item>
+    </style>
+
+
+
+
+<!--    <style name="RegularRedButton" parent="ButtonRegular">-->
+<!--        <item name="backgroundTint">@color/red_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="RegularGreenButton" parent="ButtonRegular">-->
+<!--        <item name="backgroundTint">@color/green_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="RegularBlueButton" parent="ButtonRegular">-->
+<!--        <item name="backgroundTint">@color/blue_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="RegularOrangeButton" parent="ButtonRegular">-->
+<!--        <item name="backgroundTint">@color/orange_500</item>-->
+<!--        <item name="android:textColor">@color/primaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="RegularYellowButton" parent="ButtonRegular">-->
+<!--        <item name="backgroundTint">@color/yellow_500</item>-->
+<!--        <item name="android:textColor">@color/primaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="SmallRedButton" parent="ButtonSmall">-->
+<!--        <item name="backgroundTint">@color/red_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="SmallGreenButton" parent="ButtonSmall">-->
+<!--        <item name="backgroundTint">@color/green_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="SmallBlueButton" parent="ButtonSmall">-->
+<!--        <item name="backgroundTint">@color/blue_500</item>-->
+<!--        <item name="android:textColor">@color/secondaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="SmallOrangeButton" parent="ButtonSmall">-->
+<!--        <item name="backgroundTint">@color/orange_500</item>-->
+<!--        <item name="android:textColor">@color/primaryTextColor</item>-->
+<!--    </style>-->
+
+<!--    <style name="SmallYellowButton" parent="ButtonSmall">-->
+<!--        <item name="backgroundTint">@color/yellow_500</item>-->
+<!--        <item name="android:textColor">@color/primaryTextColor</item>-->
+<!--    </style>-->
+
+    <!--Action Based Buttons-->
+    <style name="ButtonRegularSquare" >
+        <item name="android:layout_height">55dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/padding_xl</item>
+        <item name="android:paddingRight">@dimen/padding_xl</item>
+        <item name="android:paddingTop">@dimen/padding_lg</item>
+        <item name="android:paddingBottom">@dimen/padding_lg</item>
+        <item name="android:radius">15dp</item>
+    </style>
+
+    <style name="ButtonRegularRounded" >
+        <item name="android:background">@drawable/rounded_button</item>
+        <item name="android:layout_height">55dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/padding_xl</item>
+        <item name="android:paddingRight">@dimen/padding_xl</item>
+        <item name="android:paddingTop">@dimen/padding_lg</item>
+        <item name="android:paddingBottom">@dimen/padding_lg</item>
+        <item name="android:radius">15dp</item>
+    </style>
+
+    <style name="ButtonLargeSquare" parent="ButtonRegularSquare" >
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/padding_2xl</item>
+        <item name="android:paddingRight">@dimen/padding_2xl</item>
+        <item name="android:paddingTop">@dimen/padding_lg</item>
+        <item name="android:paddingBottom">@dimen/padding_lg</item>
+    </style>
+
+    <style name="ButtonSmallRounded" parent="ButtonRegularRounded" >
+        <item name="android:layout_height">30dp</item>
+    </style>
+
+    <style name="ButtonSmallSquare" parent="ButtonRegularSquare" >
+        <item name="android:layout_height">30dp</item>
+    </style>
+
 </resources>

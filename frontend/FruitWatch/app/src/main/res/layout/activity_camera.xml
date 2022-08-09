@@ -29,37 +29,39 @@
 
     <TextView
         android:id="@+id/cameraprev_guide_instructions"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:lines="2"
+        android:padding="@dimen/padding_lg"
         android:text="@string/camera_guide_instructions"
         android:textAlignment="center"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_lg"
+        android:background="@drawable/guide_box_text_background"
+        android:textColor="@color/primaryTextColor"
         android:textSize="@dimen/font_size_md"
-        app:layout_constraintTop_toBottomOf="@+id/cameraprev_itemGuide" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/cameraprev_itemGuide" />
 
     <Button
         android:id="@+id/goBackBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-6dp"
-        android:layout_marginEnd="-6dp"
-        android:padding="@dimen/padding_xl"
-        android:text="Go Back"
-        android:drawableLeft="@drawable/ic_baseline_arrow_back_24"
+        android:layout_marginTop="-7dp"
+        android:layout_marginStart="-6dp"
+        style="@style/GoBackButton"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/captureBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Capture"
+        style="@style/CaptureButton"
         android:layout_marginBottom="-6dp"
-        android:layout_marginHorizontal="-6dp"
-        android:padding="@dimen/padding_lg"
-        android:drawableTop="@drawable/ic_menu_camera"
-        android:textColor="@color/black"
+        android:layout_marginStart="-6dp"
+        android:layout_marginEnd="-6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

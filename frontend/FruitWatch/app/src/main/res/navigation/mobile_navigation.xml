@@ -17,4 +17,10 @@
         android:label="@string/menu_results"
         tools:layout="@layout/fragment_results" />
 
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.team12.fruitwatch.ui.main.fragments.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+
 </navigation>

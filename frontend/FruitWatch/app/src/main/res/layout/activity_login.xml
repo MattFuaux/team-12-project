@@ -21,98 +21,109 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="@dimen/margin_3xl"
+        android:background="@drawable/fruit_watch_text_logo"
+        android:contentDescription="@string/content_desc_fruit_watch_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTgl" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4"
-        android:layout_marginEnd="@dimen/margin_lg"
         android:layout_marginStart="@dimen/margin_lg"
+        android:layout_marginEnd="@dimen/margin_lg"
         android:padding="@dimen/padding_lg"
 
-        >
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+
+        app:layout_constraintVertical_bias="0.4">
 
         <EditText
             android:id="@+id/firstname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="96dp"
+            android:layout_marginTop="@dimen/margin_xl"
+            android:autofillHints="name"
             android:hint="@string/prompt_firstname"
-            android:padding="@dimen/padding_lg"
             android:inputType="textPersonName"
+            android:padding="@dimen/padding_lg"
             android:selectAllOnFocus="true"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:visibility="invisible"
-            android:autofillHints="name" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/surname"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:autofillHints="name"
             android:hint="@string/prompt_surname"
-            android:padding="@dimen/padding_lg"
             android:inputType="textPersonName"
+            android:padding="@dimen/padding_lg"
             android:selectAllOnFocus="true"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/firstname"
-            android:autofillHints="name" />
+            app:layout_constraintTop_toBottomOf="@id/firstname" />
 
         <EditText
             android:id="@+id/email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:autofillHints="emailAddress"
             android:hint="@string/prompt_email"
-            android:padding="@dimen/padding_lg"
-            
+
             android:inputType="textEmailAddress"
+            android:padding="@dimen/padding_lg"
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/surname"
-            android:autofillHints="emailAddress" />
+            app:layout_constraintTop_toBottomOf="@id/surname" />
 
         <EditText
             android:id="@+id/password"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:padding="@dimen/padding_lg"
-            
+            android:autofillHints="password"
+
             android:hint="@string/prompt_password"
             android:imeActionLabel="@string/action_sign_in"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
+            android:padding="@dimen/padding_lg"
             android:selectAllOnFocus="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/email"
-            android:autofillHints="password" />
+            app:layout_constraintTop_toBottomOf="@+id/email" />
 
         <EditText
             android:id="@+id/confirmPassword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:padding="@dimen/padding_lg"
+            android:autofillHints="password"
             android:hint="@string/prompt_confirm_password"
             android:imeActionLabel="@string/action_sign_in"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:visibility="invisible"
+            android:padding="@dimen/padding_lg"
             android:selectAllOnFocus="true"
+            android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password"
-            android:autofillHints="password" />
+            app:layout_constraintTop_toBottomOf="@+id/password" />
 
         <Button
             android:id="@+id/login"
@@ -121,6 +132,7 @@
             android:layout_gravity="start"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"
+            style="@style/SignInButton"
             android:enabled="false"
             android:text="@string/action_sign_in"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -1,37 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_past_search_root_layout"
     android:layout_width="match_parent"
-    android:layout_height="75dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/card_past_search_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Item Name"
-        android:textSize="@dimen/font_size_lg"
-        android:layout_marginStart="@dimen/margin_lg"
-        app:layout_constraintBottom_toTopOf="@+id/card_past_search_date_searched"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/card_past_search_date_searched"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Searched: Two days ago"
-        android:layout_marginStart="@dimen/margin_lg"
-        android:layout_marginBottom="@dimen/margin_md"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageView
-        android:id="@+id/card_past_search_image_searched"
-        android:layout_width="75dp"
-        android:src="@drawable/past_search_image_placeholder"
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:strokeColor="@color/black"
+    app:strokeWidth="1dp"
+    app:shapeAppearance="@style/ShapeAppearance.HistoryCard"
+    app:cardElevation="2dp"
+    app:cardMaxElevation="3dp"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/radius_md"
+    app:rippleColor="@color/primaryExtraDarkColor"
+    >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        >
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/card_past_search_item_name"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:text="Item Name"
+            android:textColor="@color/primaryTextColor"
+            android:background="@color/primaryLightColor"
+            android:paddingStart="@dimen/padding_lg"
+            android:textSize="@dimen/font_size_lg"
+            app:layout_constraintBottom_toTopOf="@+id/card_past_search_date_searched"
+            app:layout_constraintEnd_toStartOf="@+id/card_past_search_image_searched"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/card_past_search_image_searched" />
+
+        <TextView
+            android:id="@+id/card_past_search_date_searched"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/primaryDarkColor"
+            android:gravity="center"
+            android:padding="@dimen/padding_lg"
+            android:text="Last Searched: Two days ago"
+            android:textColor="@color/secondaryTextColor"
+            app:layout_constraintBottom_toBottomOf="@id/card_past_search_image_searched"
+
+            app:layout_constraintEnd_toStartOf="@+id/card_past_search_image_searched"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/card_past_search_image_searched"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:src="@drawable/past_search_image_placeholder"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
