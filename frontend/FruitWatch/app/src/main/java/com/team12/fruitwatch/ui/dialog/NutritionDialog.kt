@@ -2,7 +2,7 @@ package com.team12.fruitwatch.ui.dialog
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -15,7 +15,7 @@ import java.util.*
 
 class NutritionDialog(
     context: Context,
-    private var imageBitmap: Bitmap,
+    private var imageByteArray: ByteArray,
     private var resultNutrition: NetworkRequestController.SearchResults
 ) : Dialog(context) {
 
@@ -39,7 +39,7 @@ class NutritionDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.nutrition_dialog)
         itemIV = findViewById(R.id.diag_nutrition_item_img)
-        itemIV.setImageBitmap(imageBitmap)
+        itemIV.setImageBitmap(BitmapFactory.decodeByteArray(imageByteArray,0,imageByteArray.size))
         closeBtn = findViewById(R.id.diag_nutrition_close_btn)
         closeBtn.setOnClickListener { dismiss() }
         infoTbl = findViewById(R.id.diag_nutrition_info_tbl)
@@ -143,7 +143,6 @@ class NutritionDialog(
             }
         }
     }
-
 
     private fun processNutrition(resultNutrition: NetworkRequestController.SearchResults): Array<NutritionData?> {
 

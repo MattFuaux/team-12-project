@@ -23,27 +23,25 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.FruitWatch.NoActionBar" />
-        <activity
-            android:name=".ui.splash.SplashActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.FruitWatch.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:theme="@style/Theme.FruitWatch.NoActionBar"
+            />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name="com.team12.fruitwatch.ui.main.fragments.settings.SettingsFragment"
             android:exported="false"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:screenOrientation="portrait"
-            android:exported="true" />
+            android:theme="@style/Theme.FruitWatch.NoActionBar"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.camera.CameraActivity"
             android:exported="false"

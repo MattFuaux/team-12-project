@@ -1,30 +1,17 @@
 package com.team12.fruitwatch.controllers
 
 
-import android.graphics.Bitmap
 import android.os.Parcelable
-import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
-import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.gson.jsonBody
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.fuel.httpUpload
-import com.github.kittinunf.result.Result
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
-import kotlinx.coroutines.*
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
-import java.io.ByteArrayInputStream
-import java.io.DataOutputStream
 import java.io.File
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.nio.charset.Charset
 
 
@@ -41,7 +28,7 @@ class NetworkRequestController {
     private val URL_RE_SEARCH = "$URL_PREFIX$URL_IP/research"
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
-            "\"name\":\"orange\"," +
+            "\"name\":\"Navel Orange\"," +
             "\"calories\": 73," +
             "\"fat_g\": 0.2," +
             "\"sodium_mg\": 13," +
@@ -146,6 +133,7 @@ class NetworkRequestController {
         val sodium_mg:String?,
         val sugar_g:String?
         ) : Parcelable
+
 
     fun startSearchWithItemName(loggedInUser: LoggedInUser, itemNameToSearch: String): SearchResults {
         return if(!MainActivity.IN_DEVELOPMENT) {

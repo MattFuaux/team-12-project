@@ -11,6 +11,7 @@
         <item
             android:id="@+id/nav_results"
             android:icon="@drawable/ic_menu_history"
+            android:visible="false"
             android:title="@string/menu_results" />
         <item
             android:id="@+id/nav_settings"

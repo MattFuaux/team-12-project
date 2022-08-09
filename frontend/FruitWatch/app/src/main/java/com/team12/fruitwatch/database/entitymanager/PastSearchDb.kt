@@ -1,17 +1,11 @@
 package com.team12.fruitwatch.database.entitymanager
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.team12.fruitwatch.database.AbstractDb
 import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.ui.main.fragments.search.PastSearchItemModel
-import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-
-//import com.team12.fruitwatch.ui.courses.PastSearchItemModel
 
 class PastSearchDb(val context: Context?) : AbstractDb(context) {
 
@@ -62,14 +56,14 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         if(allPastSearches.count > 0){
             allPastSearches.moveToFirst()
             while (!allPastSearches.isAfterLast){
-                val itemImage = allPastSearches.getBlob(allPastSearches.getColumnIndex(COL_ITEM_IMAGE))
+
                 val course = PastSearch(
-                    allPastSearches.getLong(allPastSearches.getColumnIndex("id")),
-                    allPastSearches.getString(allPastSearches.getColumnIndex(COL_ITEM_NAME)),
-                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndex(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
-                    BitmapFactory.decodeByteArray(itemImage,0, itemImage.size),
+                    allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),
+                    allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)),
+                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                    allPastSearches.getBlob(allPastSearches.getColumnIndexOrThrow(COL_ITEM_IMAGE)),
                 )
-                coursesHashMap.set(allPastSearches.getLong(allPastSearches.getColumnIndex("id")),course)
+                coursesHashMap.set(allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),course)
                 allPastSearches.moveToNext()
             }
             allPastSearches.close()
@@ -85,12 +79,12 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         if(allPastSearches.count > 0){
             allPastSearches.moveToFirst()
             while (!allPastSearches.isAfterLast){
-                val itemImage = allPastSearches.getBlob(allPastSearches.getColumnIndex(COL_ITEM_IMAGE))
+                
                 val course = PastSearch(
-                    allPastSearches.getLong(allPastSearches.getColumnIndex("id")),
-                    allPastSearches.getString(allPastSearches.getColumnIndex(COL_ITEM_NAME)),
-                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndex(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
-                    BitmapFactory.decodeByteArray(itemImage,0, itemImage.size)
+                    allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),
+                    allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)),
+                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                    allPastSearches.getBlob(allPastSearches.getColumnIndexOrThrow(COL_ITEM_IMAGE))
                 )
                 coursesArrayList.add(course)
                 allPastSearches.moveToNext()
@@ -108,7 +102,7 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         if(allPastSearches.count > 0){
             allPastSearches.moveToFirst()
             while (!allPastSearches.isAfterLast()){
-                coursesArrayList.add(allPastSearches.getString(allPastSearches.getColumnIndex(COL_ITEM_NAME)))
+                coursesArrayList.add(allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)))
                 allPastSearches.moveToNext()
             }
             allPastSearches.close()
@@ -118,19 +112,19 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
     }
 
     // Provides saved past searches for a Listview or Recycleview
-    fun getPastSearchItemModelList():ArrayList<PastSearchItemModel>{
+    fun getPastSearchItemModelList():ArrayList<PastSearch>{
         open()
         val allPastSearches = all()
-        val pastSearchArrayList = ArrayList<PastSearchItemModel>()
+        val pastSearchArrayList = ArrayList<PastSearch>()
         if(allPastSearches.count > 0){
             allPastSearches.moveToFirst()
             while (!allPastSearches.isAfterLast){
-                val itemImage = allPastSearches.getBlob(allPastSearches.getColumnIndex(COL_ITEM_IMAGE))
-                val pastSearch = PastSearchItemModel(
-                    allPastSearches.getLong(allPastSearches.getColumnIndex("id")),
-                    allPastSearches.getString(allPastSearches.getColumnIndex(COL_ITEM_NAME)),
-                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndex(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                    BitmapFactory.decodeByteArray(itemImage,0, itemImage.size)
+                
+                val pastSearch = PastSearch(
+                    allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),
+                    allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)),
+                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                    allPastSearches.getBlob(allPastSearches.getColumnIndexOrThrow(COL_ITEM_IMAGE))
                 )
                 pastSearchArrayList.add(pastSearch)
                 allPastSearches.moveToNext()
@@ -146,12 +140,12 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
 
         if(pastSearch != null){
             pastSearch.moveToFirst()
-            val itemImage = pastSearch.getBlob(pastSearch.getColumnIndex(COL_ITEM_IMAGE))
+            val itemImage = pastSearch.getBlob(pastSearch.getColumnIndexOrThrow(COL_ITEM_IMAGE))
             val p = PastSearch(
-                pastSearch.getLong(pastSearch.getColumnIndex("id")),
-                pastSearch.getString(pastSearch.getColumnIndex(COL_ITEM_NAME)),
-                LocalDateTime.parse( pastSearch.getString(pastSearch.getColumnIndex(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
-                BitmapFactory.decodeByteArray(itemImage,0, itemImage.size)
+                pastSearch.getLong(pastSearch.getColumnIndexOrThrow("id")),
+                pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_ITEM_NAME)),
+                LocalDateTime.parse( pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                pastSearch.getBlob(pastSearch.getColumnIndexOrThrow(COL_ITEM_IMAGE))
             )
             pastSearch.close()
             close()
@@ -163,18 +157,14 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         return null
     }
 
-    fun createPastSearchEntry(pastSearch: PastSearch):Boolean{
+    fun createPastSearchEntry(pastSearch: PastSearch):Long{
         open()
         val values  = HashMap<String, Any>()
         values.put(COL_ITEM_NAME,pastSearch.itemName!!)
         values.put(COL_SEARCH_DATE,pastSearch.itemSearchDate!!.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-        val stream = ByteArrayOutputStream()
-        pastSearch.itemImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        val byteArray: ByteArray = stream.toByteArray()
-        pastSearch.itemImage!!.recycle()
-        values.put(COL_ITEM_IMAGE,byteArray)
+        values.put(COL_ITEM_IMAGE,pastSearch.itemImage!!)
         val result = create(values)
         close()
-        return result != -1L
+        return result
     }
 }
