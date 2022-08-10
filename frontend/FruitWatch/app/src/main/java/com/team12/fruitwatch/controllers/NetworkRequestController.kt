@@ -20,12 +20,13 @@ class NetworkRequestController {
     private val logTag = "NetworkRequestController"
 
     private val URL_PREFIX = "http://"
-    private val URL_IP = "54.253.79.220:8080"
-    private val URL_REGISTER = "$URL_PREFIX$URL_IP/register"
-    private val URL_LOGIN = "$URL_PREFIX$URL_IP/authenticate"
-    private val URL_LOGOUT = "$URL_PREFIX$URL_IP/logout"
-    private val URL_SEARCH = "$URL_PREFIX$URL_IP/search"
-    private val URL_RE_SEARCH = "$URL_PREFIX$URL_IP/research"
+    private val URL_IP = "54.252.63.41"
+    private val URL_PORT = "8080"
+    private val URL_REGISTER = "$URL_PREFIX$URL_IP:$URL_PORT/register"
+    private val URL_LOGIN = "$URL_PREFIX$URL_IP:$URL_PORT/authenticate"
+    private val URL_LOGOUT = "$URL_PREFIX$URL_IP:$URL_PORT/logout"
+    private val URL_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search"
+    private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/text-search"
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"Navel Orange\"," +
@@ -92,6 +93,11 @@ class NetworkRequestController {
         val password:String
         )
 
+    data class TextSearchDetails(
+        @SerializedName("fruitName")
+        val fruitName:String
+    )
+
     @Parcelize
     data class StorePrice(
         val store:String,
@@ -138,9 +144,9 @@ class NetworkRequestController {
     fun startSearchWithItemName(loggedInUser: LoggedInUser, itemNameToSearch: String): SearchResults {
         return if(!MainActivity.IN_DEVELOPMENT) {
             // Make network/server call here
-            val parameters = listOf<Pair<String,Any?>>(Pair("itemName",itemNameToSearch))
-            val response = Fuel.post(URL_RE_SEARCH, parameters)
-                .header(Headers.COOKIE to loggedInUser.jwt).response()
+            //val parameters = listOf<Pair<String,Any?>>(Pair("itemName",itemNameToSearch))
+            val response = Fuel.post(URL_TEXT_SEARCH)
+                .header(Headers.COOKIE to loggedInUser.jwt).jsonBody(TextSearchDetails(itemNameToSearch)).response()
             val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
             val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
             resultObject
