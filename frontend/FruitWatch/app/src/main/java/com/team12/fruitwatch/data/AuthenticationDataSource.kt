@@ -13,9 +13,9 @@ class AuthenticationDataSource {
 
     suspend fun login(email: String, password: String): Result<LoggedInUser> {
         return withContext(Dispatchers.IO){
-            if(MainActivity.IN_DEVELOPMENT){
-                return@withContext Result.Success(LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe","jwt") as LoggedInUser)
-            }
+//            if(MainActivity.IN_DEVELOPMENT){
+//                return@withContext Result.Success(LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe","jwt") as LoggedInUser)
+//            }
             try {
                 // TODO: handle loggedInUser authentication
                 val networkRequestController = NetworkRequestController()

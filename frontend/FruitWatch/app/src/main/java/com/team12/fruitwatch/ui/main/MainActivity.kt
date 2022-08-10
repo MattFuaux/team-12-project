@@ -55,9 +55,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val TAG = "MainActivity"
 
-
     companion object {
-        const val IN_DEVELOPMENT = true
+        const val IN_DEVELOPMENT = false
         lateinit var userInfo: LoggedInUser
         private var lastSearchResults: NetworkRequestController.SearchResults? = null
     }
