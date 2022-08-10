@@ -187,7 +187,7 @@ class ResultsFragment : Fragment() {
         val decimalFormat = DecimalFormat("$0.00")
         val rows = data.size
         pricesTblLay.removeAllViews()
-
+        //TODO: Add supermarket logos icons
         for (i in 0 until rows) {
             val row: PriceData? = data[i]
             // data columns

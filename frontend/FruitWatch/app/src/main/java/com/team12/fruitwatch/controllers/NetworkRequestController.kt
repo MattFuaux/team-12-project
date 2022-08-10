@@ -26,7 +26,7 @@ class NetworkRequestController {
     private val URL_LOGIN = "$URL_PREFIX$URL_IP:$URL_PORT/authenticate"
     private val URL_LOGOUT = "$URL_PREFIX$URL_IP:$URL_PORT/logout"
     private val URL_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search"
-    private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/text-search"
+    private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search-text"
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"Navel Orange\"," +

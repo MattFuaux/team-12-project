@@ -29,7 +29,7 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
         val itemDateSearched: TextView = itemView.findViewById(R.id.card_past_search_date_searched)
         val itemImage: ImageView = itemView.findViewById(R.id.card_past_search_image_searched)
         val rootLayout: View = itemView.findViewById(R.id.card_past_search_root_layout)
-
+        //TODO: Add clear user history
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
