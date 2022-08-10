@@ -142,34 +142,34 @@ class NetworkRequestController {
 
 
     fun startSearchWithItemName(loggedInUser: LoggedInUser, itemNameToSearch: String): SearchResults {
-        return if(!MainActivity.IN_DEVELOPMENT) {
+        if(!MainActivity.IN_DEVELOPMENT) {
             // Make network/server call here
             //val parameters = listOf<Pair<String,Any?>>(Pair("itemName",itemNameToSearch))
             val response = Fuel.post(URL_TEXT_SEARCH)
                 .header(Headers.COOKIE to loggedInUser.jwt).jsonBody(TextSearchDetails(itemNameToSearch)).response()
             val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
             val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-            resultObject
+            return resultObject
         }else{
             val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
             val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-            resultObject
+            return resultObject
         }
     }
 
     fun startSearchWithImage(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
-        return if(!MainActivity.IN_DEVELOPMENT) {
+         if(!MainActivity.IN_DEVELOPMENT) {
             // Make network/server call here
             val dataPart: DataPart = FileDataPart(imageToPredict)
             val response = Fuel.upload(URL_SEARCH, Method.POST).add(dataPart)
                 .header(Headers.COOKIE to loggedInUser.jwt).response()
             val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
             val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-            resultObject
+             return    resultObject
         }else{
             val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
             val resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-            resultObject
+             return resultObject
         }
     }
 
