@@ -365,3 +365,95 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(payload)
 	}
 }
+
+// SearchTextHandler accepts an input text then returns fruit nutritional info
+func SearchTextHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Search Text Endpoint Hit")
+
+	type fruitString struct {
+		Name string `json:"fruitName"`
+	}
+
+	// parse body
+	fruit := fruitString{}
+	// decode JSON body and place into user struct
+	json.NewDecoder(r.Body).Decode(&fruit)
+
+	// check for errors
+	errors := []models.Error{} // slice of error to hold each errors
+
+	// check for empty fields
+	if fruit.Name == "" {
+		// create new error object and append to errors
+		errors = append(errors, util.NewError("", "Invalid Attribute", "Fruit name must not be empty"))
+	}
+
+	// if there are errors, respond with errors
+	if len(errors) > 0 {
+		// send errors as response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+
+		json.NewEncoder(w).Encode(models.Errors{Errors: errors}) // send errors as response
+		return
+	}
+
+	// get nutritional info from CalorieNinja based on predicted fruit name
+	fruitNutritionInfo := getNutritionalInfo(fruit.Name)
+
+	// get coles pricing
+	colesPriceMap := getColesPrice(fruit.Name)
+
+	// The model will always output a prediction but the predicted fruit may not exist in CalorieNinja
+	// if this is the case, just return the name of the predicted fruit with a message.
+	if len(fruitNutritionInfo.Items) == 0 {
+		// send details with no nutiritonal info
+		payload := models.Fruit{
+			Name: fruit.Name,
+			Prices: []models.Price{
+				{
+					Store:    colesPriceMap["store"],
+					Price:    colesPriceMap["price"],
+					Quantity: colesPriceMap["quantity"],
+					Date:     colesPriceMap["date"],
+				},
+			},
+		}
+
+		// Respond in JSON
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+
+		json.NewEncoder(w).Encode(payload)
+
+	} else {
+		payload := models.Fruit{
+			Name:      fruit.Name,
+			Calories:  fruitNutritionInfo.Items[0].Calories,
+			Carbs:     fruitNutritionInfo.Items[0].Carbs,
+			Chols:     fruitNutritionInfo.Items[0].Chols,
+			FatSat:    fruitNutritionInfo.Items[0].FatSat,
+			FatTotal:  fruitNutritionInfo.Items[0].FatTotal,
+			Fiber:     fruitNutritionInfo.Items[0].Fiber,
+			Potassium: fruitNutritionInfo.Items[0].Potassium,
+			Protein:   fruitNutritionInfo.Items[0].Protein,
+			Serving:   fruitNutritionInfo.Items[0].Serving,
+			Sodium:    fruitNutritionInfo.Items[0].Sodium,
+			Sugar:     fruitNutritionInfo.Items[0].Sugar,
+			Prices: []models.Price{
+				{
+					Store:    colesPriceMap["store"],
+					Price:    colesPriceMap["price"],
+					Quantity: colesPriceMap["quantity"],
+					Date:     colesPriceMap["date"],
+				},
+			},
+		}
+
+		// Respond in JSON
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+
+		json.NewEncoder(w).Encode(payload)
+	}
+}
