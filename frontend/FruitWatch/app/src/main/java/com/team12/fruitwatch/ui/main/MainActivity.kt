@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     companion object {
-        const val IN_DEVELOPMENT = true
+        const val IN_DEVELOPMENT = false
         lateinit var userInfo: LoggedInUser
         private var lastSearchResults: NetworkRequestController.SearchResults? = null
     }
@@ -101,8 +101,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userDisplayName = navView.getHeaderView(0).findViewById(R.id.nav_main_subtitle)
         userInfo = intent.getParcelableExtra("USER_KEY")!!
         userDisplayName.text = userInfo.displayName
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
