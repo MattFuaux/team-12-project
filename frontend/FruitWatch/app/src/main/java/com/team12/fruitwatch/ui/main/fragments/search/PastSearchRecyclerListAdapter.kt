@@ -7,12 +7,15 @@ import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.database.entities.PastSearch
+import com.team12.fruitwatch.ui.animation.LoadingAnimation
+import com.team12.fruitwatch.ui.animation.LoadingAnimationController
 import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +32,6 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
         val itemDateSearched: TextView = itemView.findViewById(R.id.card_past_search_date_searched)
         val itemImage: ImageView = itemView.findViewById(R.id.card_past_search_image_searched)
         val rootLayout: View = itemView.findViewById(R.id.card_past_search_root_layout)
-        //TODO: Add clear user history
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -59,6 +61,7 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
     private fun searchForItem(pastSearch: PastSearch){
         GlobalScope.launch(Dispatchers.Main) {
             //val fruitName = result.name
+            (activity as LoadingAnimationController).onStartLoading()
             (activity as FragmentDataLink).startTextSearch(pastSearch)
         }
     }

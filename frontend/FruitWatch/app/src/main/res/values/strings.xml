@@ -59,7 +59,7 @@
     <string name="content_desc_scanned_item_image">Scanned Item Image</string>
     <string name="no_local_prices_found">No Local Prices Found!</string>
     <string name="camera_guide_instructions">Take photo with item in the box</string>
-
+    <string name="loading_prices_animation_text">One moment, harvesting prices..</string>
 
 
 </resources>

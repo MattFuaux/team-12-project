@@ -78,7 +78,7 @@ class CameraActivity : Activity() {
         goBack = findViewById<View>(R.id.goBackBtn) as Button
         capture = findViewById<View>(R.id.captureBtn) as Button
         goBack!!.setOnClickListener { stopCamera() }
-        capture!!.setOnClickListener { // TODO Auto-generated method stub
+        capture!!.setOnClickListener {
             captureImage()
         }
         camera = getCameraInstance()
