@@ -14,6 +14,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.setMargins
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.team12.fruitwatch.R
@@ -21,13 +23,14 @@ import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.databinding.FragmentResultsBinding
 import com.team12.fruitwatch.ui.camera.CameraActivity
-import com.team12.fruitwatch.ui.dialog.NutritionDialog
+import com.team12.fruitwatch.ui.dialog.nutrition.NutritionDialog
 import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.io.File
 import java.text.DecimalFormat
 import java.util.*
+
 
 class ResultsFragment : Fragment() {
 
@@ -91,10 +94,15 @@ class ResultsFragment : Fragment() {
             predFruitNameTV.text = pastSearch!!.itemName
             itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(pastSearch!!.itemImage,0,pastSearch!!.itemImage!!.size))
         }else{
-            itemImgByteArray = requireArguments().getByteArray("SEARCH_IMAGE")
-            itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
+            if (requireArguments().containsKey("SEARCH_IMAGE")){
+                itemImgByteArray = requireArguments().getByteArray("SEARCH_IMAGE")
+                itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
+            }else{
+                itemImgIV.setImageBitmap(null)
+            }
         }
         val results = requireArguments().getParcelable<NetworkRequestController.SearchResults>("SEARCH_RESULTS")
+        Log.d(TAG,"Loading Search Results: ${results.toString()}")
         showSearchResults(results!!)
 
         return root
@@ -128,7 +136,7 @@ class ResultsFragment : Fragment() {
 
     private fun showSearchResults(result: NetworkRequestController.SearchResults){
         val fruitName = result.name
-        updateSearchResultFields(fruitName)
+        predFruitNameTV.text = fruitName
 
         if(result.prices != null){
             if (result.prices.isNotEmpty()) {
@@ -136,41 +144,43 @@ class ResultsFragment : Fragment() {
                 pricesTblLay.visibility = View.VISIBLE
                 loadPricesData(result.prices)
             } else {
-
                 pricesTblLay.visibility = View.GONE
                 noResultsTV.visibility = View.VISIBLE
             }
         }
         if (result.calories != "") {
-            viewNutritionBtn.visibility = View.VISIBLE
+            //viewNutritionBtn.visibility = View.VISIBLE
             if(pastSearch != null){
                 nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage!!, result)
             }else{
                 nutritionDialog = NutritionDialog(requireContext(), itemImgByteArray!!, result)
             }
 
-        } else {
-            viewNutritionBtn.visibility = View.GONE
         }
-    }
-
-    fun updateSearchResultFields(fruitName: String) {
-        predFruitNameTV.visibility = View.VISIBLE
-        predFruitNameTV.text = fruitName
+//        else {
+//            viewNutritionBtn.visibility = View.GONE
+//        }
     }
 
     private fun processPrices(resultPrices: List<NetworkRequestController.StorePrice>): Array<PriceData?> {
         val data: Array<PriceData?> = arrayOfNulls(resultPrices.size)
         var count = 0
-        for (storePrice in resultPrices) {
-            val row = PriceData()
-            row.storeName = storePrice.store
-            row.price = storePrice.price.toDouble()
-            row.unit = storePrice.quantity!!
-            row.date = storePrice.date
-            data[count] = row
-            count += 1
-        }
+        try {
+            for (storePrice in resultPrices) {
+                val row = PriceData()
+                row.storeName = storePrice.store
+                row.price = storePrice.price.toDouble()
+                row.unit = storePrice.quantity!!
+                row.date = storePrice.date
+                data[count] = row
+                count += 1
+            }
+
+        }catch (ne : NumberFormatException){
+            Log.e(TAG,"Number Format Error With Result Prices: $resultPrices")
+        }catch (npe : NullPointerException){
+        Log.e(TAG,"Null Pointer Error With Result Prices: $resultPrices")
+    }
         return data
     }
 
@@ -187,36 +197,48 @@ class ResultsFragment : Fragment() {
         val decimalFormat = DecimalFormat("$0.00")
         val rows = data.size
         pricesTblLay.removeAllViews()
-        //TODO: Add supermarket logos icons
         for (i in 0 until rows) {
             val row: PriceData? = data[i]
             // data columns
-            val storeName = TextView(context)
-            storeName.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
-            storeName.setTextSize(TypedValue.COMPLEX_UNIT_PX, storeTextSize.toFloat())
-            storeName.layoutParams = TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.MATCH_PARENT
-            )
 
-            storeName.gravity = Gravity.CENTER
-            storeName.setPadding(
-                horizontalRowPadding,
-                verticalRowPadding,
-                horizontalEndStorePadding,
-                verticalRowPadding
+            val tableIconCellLayoutParams = TableRow.LayoutParams(
+                300,
+                300
             )
+            tableIconCellLayoutParams.gravity = Gravity.START + Gravity.CENTER_VERTICAL
+            tableIconCellLayoutParams.setMargins(10)
 
-            storeName.setBackgroundColor(resources.getColor(R.color.green_100, null))
-            storeName.setTextColor(resources.getColor(R.color.black, null))
-            storeName.text = row!!.storeName
+            val storeIcon = ImageView(context)
+            storeIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE;
+            storeIcon.layoutParams = tableIconCellLayoutParams
+            storeIcon.setPadding(horizontalRowPadding,horizontalRowPadding,horizontalRowPadding,horizontalRowPadding)
+            storeIcon.setBackgroundColor(resources.getColor(R.color.off_white, null))
+            when(row!!.storeName.lowercase()){
+                "coles" -> {
+                    storeIcon.setImageDrawable(resources.getDrawable(R.drawable.coles_logo,null))
+                }
+                "iga" -> {
+                    storeIcon.setImageDrawable(resources.getDrawable(R.drawable.iga_logo,null))
+                }
+                "woolworths" -> {
+                    storeIcon.setImageDrawable(resources.getDrawable(R.drawable.woolworths_logo,null))
+                }
+            }
+
+            val tablePriceCellLayoutParams = TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
+            )
+            tablePriceCellLayoutParams.setMargins(
+                horizontalRowMargin, 0, horizontalRowMargin,
+                0
+            )
+            tablePriceCellLayoutParams.gravity = Gravity.CENTER
+
             val storePrice = TextView(context)
             storePrice.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             storePrice.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
-            storePrice.layoutParams = TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.MATCH_PARENT
-            )
+            storePrice.layoutParams = tablePriceCellLayoutParams
             storePrice.gravity = Gravity.CENTER
             storePrice.setPadding(
                 horizontalRowPadding,
@@ -225,7 +247,7 @@ class ResultsFragment : Fragment() {
                 verticalRowPadding
             )
             storePrice.setTextColor(resources.getColor(R.color.white, null))
-            storePrice.setBackgroundColor(resources.getColor(R.color.green_600, null))
+//            storePrice.setBackgroundColor(resources.getColor(R.color.green_600, null))
 
             storePrice.text = String.format(
                 Locale.getDefault(),
@@ -234,9 +256,20 @@ class ResultsFragment : Fragment() {
                 row.unit
             )
 
+            val tableBtnCellLayoutParams = TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
+            )
+            tableBtnCellLayoutParams.setMargins(
+                horizontalRowMargin, 0, horizontalRowMargin,
+                0
+            )
+            tableBtnCellLayoutParams.gravity = Gravity.END + Gravity.CENTER_VERTICAL
+
             val nearbyBtn = Button(context)
             nearbyBtn.text = "Find\nNearby"
             nearbyBtn.gravity = Gravity.CENTER
+            nearbyBtn.layoutParams = tableBtnCellLayoutParams
             nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
 //            nearbyBtn.setPadding(
 //                horizontalRowPadding,
@@ -258,27 +291,38 @@ class ResultsFragment : Fragment() {
 
             // add table row
             val tableRow = TableRow(context)
-            tableRow.gravity = Gravity.CENTER
+            tableRow.gravity = Gravity.CENTER_HORIZONTAL
             tableRow.id = i + 1
-            val tableRowParams = TableLayout.LayoutParams(
-                TableLayout.LayoutParams.MATCH_PARENT,
-                TableLayout.LayoutParams.MATCH_PARENT
+            if(tableRow.id %2 ==0){
+                tableRow.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
+                nearbyBtn.setBackgroundColor(resources.getColor(R.color.primaryDarkColor,null))
+            }else{
+                tableRow.setBackgroundColor(resources.getColor(R.color.primaryDarkColor,null))
+                nearbyBtn.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
+            }
+
+            val tableRowLayoutParams = TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
             )
-            tableRowParams.setMargins(
-                horizontalRowMargin, 0, horizontalRowMargin,
-                0
-            )
-            tableRow.setPadding(
-                horizontalRowPadding,
-                verticalRowPadding,
-                horizontalRowPadding,
-                verticalRowPadding
-            )
-            tableRow.layoutParams = tableRowParams
-            tableRow.addView(storeName)
+            tableRowLayoutParams.gravity = Gravity.CENTER_HORIZONTAL
+//            tableCellLayoutParams.setMargins(
+//                horizontalRowMargin, verticalRowPadding, horizontalRowMargin,
+//                verticalRowPadding
+//            )
+
+
+//            tableRow.setPadding(
+//                horizontalRowPadding,
+//                verticalRowPadding,
+//                horizontalRowPadding,
+//                verticalRowPadding
+//            )
+            tableRow.layoutParams = tableRowLayoutParams
+            tableRow.addView(storeIcon)
             tableRow.addView(storePrice)
             tableRow.addView(nearbyBtn)
-            pricesTblLay.addView(tableRow, tableRowParams)
+            pricesTblLay.addView(tableRow, tableRowLayoutParams)
         }
     }
 

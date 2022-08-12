@@ -13,6 +13,12 @@
         <item name="android:statusBarColor" >@color/primaryDarkColor</item>
         <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
         <!--        <item name="colorAccent">@color/app_theme_accent</item>-->
+
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/off_white</item>
+        <item name="android:navigationBarColor">@color/primaryDarkColor</item>
+
+
     </style>
 
 <!--    <style name="Theme.FruitWatch.Fullscreen" parent="Theme.FruitWatch">-->

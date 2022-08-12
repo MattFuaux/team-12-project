@@ -152,8 +152,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
         if (MainActivity.IN_DEVELOPMENT) {
-            email.text = Editable.Factory.getInstance().newEditable("janetdoe@mailbox.com")
-            password.text = Editable.Factory.getInstance().newEditable("janetdoe")
+            email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
+            password.text = Editable.Factory.getInstance().newEditable("testpassword")
 
             firstname.text = Editable.Factory.getInstance().newEditable("janet")
             surname.text = Editable.Factory.getInstance().newEditable("doe")
@@ -164,7 +164,7 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
-        // TODO : initiate successful logged in experience
+        // TODO : initiate successful log out experience
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",

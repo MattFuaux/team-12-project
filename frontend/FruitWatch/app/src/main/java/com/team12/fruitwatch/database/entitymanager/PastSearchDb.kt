@@ -4,6 +4,7 @@ import android.content.Context
 import com.team12.fruitwatch.database.AbstractDb
 import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.ui.main.fragments.search.PastSearchItemModel
+import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -166,5 +167,16 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         val result = create(values)
         close()
         return result
+    }
+
+    fun deleteAllPastSearches(): Boolean{
+        try{
+        open()
+        deleteAll()
+        close()
+            return true
+        }catch (e : Exception){
+            return false
+        }
     }
 }

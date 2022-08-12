@@ -37,6 +37,8 @@ import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.database.entitymanager.PastSearchDb
 import com.team12.fruitwatch.databinding.ActivityMainBinding
+import com.team12.fruitwatch.ui.animation.LoadingAnimation
+import com.team12.fruitwatch.ui.animation.LoadingAnimationController
 import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.login.LoginActivity
 import com.team12.fruitwatch.ui.login.LoginViewModel
@@ -51,7 +53,7 @@ import java.io.File
 import java.time.LocalDateTime
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentDataLink {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentDataLink , LoadingAnimationController {
 
     private val TAG = "MainActivity"
 
@@ -67,7 +69,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navView: NavigationView
     private lateinit var latestBundle: Bundle
-
+    private lateinit var loadingAnimation: LoadingAnimation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +102,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userDisplayName = navView.getHeaderView(0).findViewById(R.id.nav_main_subtitle)
         userInfo = intent.getParcelableExtra("USER_KEY")!!
         userDisplayName.text = userInfo.displayName
+        loadingAnimation = LoadingAnimation(this, "loading.json")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -132,11 +135,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggleResultsMenuItemVisibility()
         when (item.itemId) {
             R.id.nav_search -> {
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                val navController = navHostFragment.findNavController()
                 navController.navigate(item.itemId)
             }
             R.id.nav_results -> {
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                val navController = navHostFragment.findNavController()
                 if (!latestBundle.isEmpty) {
                     navController.navigate(R.id.nav_results, latestBundle)
                 } else {
@@ -152,7 +155,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_settings -> {
                 //startActivity(Intent(this, SettingsActivity::class.java))
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                val navController = navHostFragment.findNavController()
                 navController.navigate(R.id.nav_settings)
             }
             R.id.nav_logout -> {
@@ -187,6 +190,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onStart() {
         super.onStart()
         toggleResultsMenuItemVisibility()
+        //loadingAnimation.playAnimation(true)
     }
 
     private fun checkCameraPermissions(context: Context?) {
@@ -213,6 +217,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
+            onStartLoading()
             val imageFile = getSavedImageFileFromInternalStorage()
             startImageSearch(imageFile)
         } else if (resultCode == CameraActivity.RESULT_FAILED) {
@@ -222,14 +227,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun startTextSearch(pastSearch: PastSearch) {
+
         GlobalScope.launch(Dispatchers.IO) {
             lastSearchResults = NetworkRequestController().startSearchWithItemName(userInfo, pastSearch.itemName!!)
             latestBundle = Bundle()
             latestBundle.putParcelable("SEARCH_RESULTS", lastSearchResults)
             latestBundle.putParcelable("PAST_SEARCH_REQUEST", pastSearch)
             GlobalScope.launch(Dispatchers.Main) {
+                onFinishedLoading()
                 toggleResultsMenuItemVisibility()
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                val navController = navHostFragment.findNavController()
                 navController.navigate(R.id.nav_results, latestBundle)
             }
 //            resultsFragment.arguments = bundle
@@ -242,10 +249,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun startImageSearch(imageFile: File) {
-        // TODO: Add loading wheel while waiting for network activity
         GlobalScope.launch(Dispatchers.IO) {
             lastSearchResults = NetworkRequestController().startSearchWithImage(userInfo, imageFile)
-
             latestBundle = Bundle()
             if (lastSearchResults!!.name != "Unknown") {
                 val pastSearch = PastSearch(-1L, lastSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
@@ -271,8 +276,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 //            resultsFragment.arguments = bundle
             GlobalScope.launch(Dispatchers.Main) {
+                onFinishedLoading()
                 toggleResultsMenuItemVisibility()
-                val navController = findNavController(R.id.nav_host_fragment_content_main)
+                val navController = navHostFragment.findNavController()
                 navController.navigate(R.id.nav_results, latestBundle)
             }
 
@@ -297,8 +303,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun openSearchFrag() {
         toggleResultsMenuItemVisibility()
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = navHostFragment.findNavController()
         navController.navigate(R.id.nav_search)
+    }
+
+    override fun onStartLoading() {
+        loadingAnimation.playAnimation()
+    }
+
+    override fun onFinishedLoading() {
+        // After loading is done, stop the animation and reset the current view
+        loadingAnimation.stopAnimation()
     }
 
 }

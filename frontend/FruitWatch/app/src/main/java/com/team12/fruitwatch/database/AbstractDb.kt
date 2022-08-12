@@ -64,6 +64,10 @@ abstract class AbstractDb(context: Context?) {
         return database!!.delete(tableName, COL_ID + " = " + id, null)
     }
 
+    fun deleteAll(): Int {
+        return database!!.delete(tableName, null, null)
+    }
+
     fun find(columnsToSearch: String?, searchArgs: Array<String?>?): Cursor? {
         val cursor: Cursor = database!!.query(
             tableName, columns,

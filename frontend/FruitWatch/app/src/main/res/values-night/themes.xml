@@ -10,9 +10,15 @@
         <item name="colorSecondaryVariant">@color/secondaryLightColor</item>
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
 <!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >@color/primaryDarkColor</item>
 <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 <!--        <item name="colorAccent">@color/app_theme_accent</item>-->
+
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/off_black</item>
+        <item name="android:navigationBarColor">@color/primaryExtraDarkColor</item>
+
+
     </style>
 
 <!--    <style name="ThemeOverlay.FruitWatch.FullscreenContainer" parent="">-->

@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primaryColor"
+
     tools:context=".ui.main.fragments.search.SearchFragment">
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="@dimen/padding_lg"
-        android:background="@color/off_white"
-        app:layout_constraintBottom_toTopOf="@+id/frag_search_take_pic_btn"
+        app:layout_constraintBottom_toTopOf="@+id/frag_search_btn_layout"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -25,15 +25,31 @@
         </androidx.recyclerview.widget.RecyclerView>
     </ScrollView>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frag_search_btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/primaryColor">
+
     <Button
         android:id="@+id/frag_search_take_pic_btn"
         android:layout_width="wrap_content"
         android:textSize="@dimen/font_size_md"
         style="@style/SearchButtonLarge"
-        android:layout_marginBottom="@dimen/margin_md"
+        android:layout_marginStart="@dimen/margin_md"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/frag_search_clear_history_btn"
+        style="@style/ClearButton"
+        android:layout_marginEnd="@dimen/margin_md"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+         />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
