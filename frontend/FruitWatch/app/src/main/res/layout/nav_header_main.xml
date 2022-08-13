@@ -18,19 +18,13 @@
         android:layout_height="80dp"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/padding_2xl"
-
         app:srcCompat="@drawable/fruit_watch_menu_banner" />
 
     <TextView
+        android:id="@+id/nav_main_subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/nav_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-    <TextView
-        android:id="@+id/nav_main_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_lg"
+        android:textAlignment="center"
         android:text="" />
 </LinearLayout>

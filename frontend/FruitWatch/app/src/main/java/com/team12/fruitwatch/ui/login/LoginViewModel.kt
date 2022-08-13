@@ -41,6 +41,16 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         return loginRepository.logout(jwt)
     }
 
+    suspend fun isEntryValid(jwt: String)  {
+        // can be launched in a separate asynchronous job
+        val result = loginRepository.checkIfValid(jwt)
+        if (result is Result.Success) {
+            _loginResult.value = LoginResult(success = LoggedInUserView(result.data.userId,result.data.displayName,result.data.jwt))
+        } else {
+            _loginResult.value = LoginResult(error = R.string.check_valid_failed)
+        }
+    }
+
     fun loginDataChanged(email: String, password: String) {
         if (!isEmailValid(email)) {
             _loginForm.value = LoginFormState(emailError = R.string.invalid_email)

@@ -103,7 +103,7 @@ class ResultsFragment : Fragment() {
         }
         val results = requireArguments().getParcelable<NetworkRequestController.SearchResults>("SEARCH_RESULTS")
         Log.d(TAG,"Loading Search Results: ${results.toString()}")
-        showSearchResults(results!!)
+        showSearchResults(results)
 
         return root
     }
@@ -134,32 +134,40 @@ class ResultsFragment : Fragment() {
         return File(directory, "image.png")
     }
 
-    private fun showSearchResults(result: NetworkRequestController.SearchResults){
-        val fruitName = result.name
-        predFruitNameTV.text = fruitName
+    private fun showSearchResults(result: NetworkRequestController.SearchResults?){
+        if(result != null) {
+            val fruitName = result.name
+            predFruitNameTV.text = fruitName
 
-        if(result.prices != null){
-            if (result.prices.isNotEmpty()) {
-                noResultsTV.visibility = View.GONE
-                pricesTblLay.visibility = View.VISIBLE
-                loadPricesData(result.prices)
-            } else {
-                pricesTblLay.visibility = View.GONE
-                noResultsTV.visibility = View.VISIBLE
+            if (result.prices != null) {
+                if (result.prices.isNotEmpty()) {
+                    noResultsTV.visibility = View.GONE
+                    pricesTblLay.visibility = View.VISIBLE
+                    loadPricesData(result.prices)
+                } else {
+                    pricesTblLay.visibility = View.GONE
+                    noResultsTV.visibility = View.VISIBLE
+                }
             }
-        }
-        if (result.calories != "") {
-            //viewNutritionBtn.visibility = View.VISIBLE
-            if(pastSearch != null){
-                nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage!!, result)
-            }else{
-                nutritionDialog = NutritionDialog(requireContext(), itemImgByteArray!!, result)
-            }
+            if (result.calories != "") {
+                //viewNutritionBtn.visibility = View.VISIBLE
+                if (pastSearch != null) {
+                    nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage!!, result)
+                } else {
+                    nutritionDialog = NutritionDialog(requireContext(), itemImgByteArray!!, result)
+                }
 
-        }
+            }
 //        else {
 //            viewNutritionBtn.visibility = View.GONE
 //        }
+        }else{
+            viewNutritionBtn.visibility = View.INVISIBLE
+            noResultsTV.visibility = View.VISIBLE
+            noResultsTV.gravity = Gravity.CENTER
+            noResultsTV.text = "No results to show, start a 'New Search' to view the results"
+        }
+
     }
 
     private fun processPrices(resultPrices: List<NetworkRequestController.StorePrice>): Array<PriceData?> {
@@ -269,6 +277,7 @@ class ResultsFragment : Fragment() {
             val nearbyBtn = Button(context)
             nearbyBtn.text = "Find\nNearby"
             nearbyBtn.gravity = Gravity.CENTER
+            nearbyBtn.setTextColor(resources.getColor(R.color.lighttextcolor,null))
             nearbyBtn.layoutParams = tableBtnCellLayoutParams
             nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
 //            nearbyBtn.setPadding(
@@ -295,10 +304,10 @@ class ResultsFragment : Fragment() {
             tableRow.id = i + 1
             if(tableRow.id %2 ==0){
                 tableRow.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
-                nearbyBtn.setBackgroundColor(resources.getColor(R.color.primaryDarkColor,null))
+                nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentDarkColor,null))
             }else{
-                tableRow.setBackgroundColor(resources.getColor(R.color.primaryDarkColor,null))
-                nearbyBtn.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
+                tableRow.setBackgroundColor(resources.getColor(R.color.primaryLightColor,null))
+                nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentColor,null))
             }
 
             val tableRowLayoutParams = TableRow.LayoutParams(

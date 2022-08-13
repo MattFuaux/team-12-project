@@ -37,7 +37,7 @@
         android:gravity="center"
         android:layout_marginBottom="@dimen/margin_lg"
         android:background="@drawable/guide_box_text_background"
-        android:textColor="@color/primaryTextColor"
+        android:textColor="@color/lighttextcolor"
         android:textSize="@dimen/font_size_md"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,6 @@
         android:layout_marginTop="-7dp"
         android:layout_marginStart="-6dp"
         style="@style/GoBackButton"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

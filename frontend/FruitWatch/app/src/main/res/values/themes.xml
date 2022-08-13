@@ -1,22 +1,26 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.FruitWatch" parent="Theme.AppCompat.DayNight">
+    <style name="Theme.FruitWatch" parent="Theme.AppCompat">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryVariant">@color/primaryLightColor</item>
-        <item name="colorOnPrimary">@color/primaryTextColor</item>
+        <item name="colorOnSurface">@color/lighttextcolor</item>
         <!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColor</item>
-        <item name="colorOnSecondary">@color/secondaryTextColor</item>
+        <item name="colorOnSecondary">@color/darktextcolor</item>
         <!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
         <item name="android:statusBarColor" >@color/primaryDarkColor</item>
         <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-        <!--        <item name="colorAccent">@color/app_theme_accent</item>-->
+        <item name="colorAccent">@color/accentColor</item>
 
+        <item name="android:colorForeground">@color/lighttextcolor</item>
+<!--        <item name="textColorSecondary">@color/accentColor</item>-->
+
+        textColorPrimary
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/off_white</item>
-        <item name="android:navigationBarColor">@color/primaryDarkColor</item>
+        <item name="android:navigationBarColor">@color/primaryColor</item>
 
 
     </style>

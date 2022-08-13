@@ -6,6 +6,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.gson.jsonBody
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
@@ -28,6 +29,9 @@ class NetworkRequestController {
     private val URL_LOGOUT = "$URL_PREFIX$URL_IP:$URL_PORT/logout"
     private val URL_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search"
     private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search-text"
+    private val URL_CHECK_VALID = "$URL_PREFIX$URL_IP:$URL_PORT/check-valid"
+
+
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"Navel Orange\"," +
@@ -185,7 +189,6 @@ class NetworkRequestController {
     fun registerUser(firstname:String, surname: String, email:String, password: String): ResponseData {
         // Make network/server call here
         val response = Fuel.post(URL_REGISTER).jsonBody(RegistrationDetails(firstname,surname,email,password)).response()
-        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 
@@ -206,7 +209,14 @@ class NetworkRequestController {
     fun logoutUser(jwt: String): ResponseData {
         // Make network/server call here
         val response = Fuel.post(URL_LOGOUT).response()
-        //val requestResults = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
+        return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
+    }
+
+    fun checkIfValid(jwt: String): ResponseData {
+        // Make network/server call here
+        val json: JsonObject = JsonObject()
+        json.addProperty("token",jwt)
+        val response = Fuel.post(URL_CHECK_VALID).jsonBody(json).response()
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 }
