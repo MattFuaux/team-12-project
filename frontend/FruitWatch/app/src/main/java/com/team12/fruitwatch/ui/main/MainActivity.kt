@@ -3,10 +3,7 @@ package com.team12.fruitwatch.ui.main
 import android.Manifest
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -21,7 +18,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -103,11 +99,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userInfo = intent.getParcelableExtra("USER_KEY")!!
         userDisplayName.text = userInfo.displayName
         loadingAnimation = LoadingAnimation(this, "loading.json")
+        insertValidJWT()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.app_bar_menu, menu)
         val resultsItem = menu.findItem(R.id.nav_results)
         if(resultsItem != null){
             resultsItem.isVisible = lastSearchResults != null
@@ -162,6 +159,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 CoroutineScope(Dispatchers.Main).launch {
                     val loginRepo = LoginViewModel(AuthenticationRepository(AuthenticationDataSource()))
                     if (loginRepo.logout(userInfo.jwt)) {
+                        clearJWT()
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(applicationContext, R.string.logout_success, Toast.LENGTH_LONG).show()
                             startActivity(Intent(applicationContext, LoginActivity::class.java))
@@ -192,6 +190,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggleResultsMenuItemVisibility()
         //loadingAnimation.playAnimation(true)
     }
+
+    private fun insertValidJWT(){
+        val SHARED_PREF_NAME :String  = "FWS"
+        val TOKEN_PREF_NAME :String = "ult"
+        val preferences: SharedPreferences = applicationContext.getSharedPreferences(SHARED_PREF_NAME,Context.MODE_PRIVATE)
+        val storedJWT = preferences.getString(TOKEN_PREF_NAME,"None")
+        if(storedJWT != userInfo.jwt){
+            preferences.edit().putString(TOKEN_PREF_NAME, userInfo.jwt).apply()
+            Log.i(TAG,"User Token Updated")
+        }
+    }
+
+    private fun clearJWT(){
+        val SHARED_PREF_NAME :String  = "FWS"
+        val TOKEN_PREF_NAME :String = "ult"
+        val preferences: SharedPreferences = applicationContext.getSharedPreferences(SHARED_PREF_NAME,Context.MODE_PRIVATE)
+        preferences.edit().putString(TOKEN_PREF_NAME, "None").apply()
+        Log.i(TAG,"User Token Cleared")
+    }
+
+
 
     private fun checkCameraPermissions(context: Context?) {
         if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA)

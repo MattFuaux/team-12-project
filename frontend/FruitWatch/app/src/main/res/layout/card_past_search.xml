@@ -29,8 +29,8 @@
             android:layout_height="0dp"
             android:gravity="center_vertical"
             android:text="Item Name"
-            android:textColor="@color/primaryTextColor"
-            android:background="@color/primaryLightColor"
+            android:textColor="@color/darktextcolor"
+            android:background="@color/primaryExtraLightColor"
             android:paddingStart="@dimen/padding_lg"
             android:textSize="@dimen/font_size_lg"
             app:layout_constraintBottom_toTopOf="@+id/card_past_search_date_searched"
@@ -46,9 +46,8 @@
             android:gravity="center"
             android:padding="@dimen/padding_lg"
             android:text="Last Searched: Two days ago"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/lighttextcolor"
             app:layout_constraintBottom_toBottomOf="@id/card_past_search_image_searched"
-
             app:layout_constraintEnd_toStartOf="@+id/card_past_search_image_searched"
             app:layout_constraintStart_toStartOf="parent" />
 

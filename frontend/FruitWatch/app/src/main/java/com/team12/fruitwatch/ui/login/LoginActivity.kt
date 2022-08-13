@@ -1,10 +1,13 @@
 package com.team12.fruitwatch.ui.login
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -19,13 +22,11 @@ import com.team12.fruitwatch.R
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.databinding.ActivityLoginBinding
 import com.team12.fruitwatch.ui.main.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class LoginActivity : AppCompatActivity() {
 
+    private val TAG = "LoginActivity"
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
     private lateinit var firstname: EditText
@@ -159,6 +160,10 @@ class LoginActivity : AppCompatActivity() {
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
+        email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
+        password.text = Editable.Factory.getInstance().newEditable("testpassword")
+
+        checkForValidJWT()
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
@@ -191,6 +196,28 @@ class LoginActivity : AppCompatActivity() {
                 confirmPassword.visibility = View.INVISIBLE
             login.text = getText(R.string.action_sign_in)
         }
+    }
+
+    // Checks Shared Preferences for an encrypted JWT.
+    // if found checks with the server if it is valid:
+    // if it is valid auto logs user in,
+    // otherwise logs user out and resumes normal login process
+    private fun checkForValidJWT(){
+        val SHARED_PREF_NAME :String  = "FWS"
+        val TOKEN_PREF_NAME :String = "ult"
+
+        val preferences: SharedPreferences = applicationContext.getSharedPreferences(SHARED_PREF_NAME,Context.MODE_PRIVATE)
+        val currentJWT = preferences.getString(TOKEN_PREF_NAME,"None")
+        if(currentJWT != "None"){
+            Log.i(TAG,"Auto Login Attempted")
+            // Some entry found, checking if it is valid
+            CoroutineScope(Dispatchers.Main).launch {
+                loginViewModel.isEntryValid(currentJWT!!)
+            }
+        }else{
+            Log.i(TAG,"Auto Login Attempt Skipped")
+        }
+
     }
 }
 

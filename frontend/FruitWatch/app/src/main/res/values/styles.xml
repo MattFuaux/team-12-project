@@ -18,23 +18,23 @@
     </style>
 
     <style name="SearchButtonLarge" parent="ButtonLargeSquare">
-        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/secondaryDarkColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:text">Start New Search</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_search_24</item>
     </style>
 
     <style name="SearchButton" parent="ButtonRegularSquare">
-        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/secondaryDarkColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_search_24</item>
     </style>
 
     <style name="ClearButton" parent="ButtonSmallSquare">
-        <item name="backgroundTint">@color/quaternaryDarkColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/accentDarkColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:text">Clear History</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_clear_all_24</item>
@@ -42,47 +42,47 @@
 
     <style name="HistoryButton" parent="ButtonRegularSquare">
         <item name="backgroundTint">@color/tertiaryColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_history_24</item>
     </style>
 
     <style name="NutritionButton" parent="ButtonRegularSquare">
-        <item name="backgroundTint">@color/deep_purple</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/accentColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_outline_info_24</item>
     </style>
 
     <style name="CaptureButton" parent="ButtonRegularSquare">
-        <item name="android:backgroundTint">@color/primaryColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:backgroundTint">@color/secondaryColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:text">Capture</item>
         <item name="android:paddingTop">@dimen/padding_lg</item>
         <item name="android:paddingBottom">@dimen/padding_lg</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
-        <item name="android:drawableTop">@drawable/ic_menu_camera</item>
+        <item name="android:drawableTop">@drawable/ic_camera</item>
     </style>
 
     <style name="GoBackButton" parent="ButtonRegularSquare">
-        <item name="android:backgroundTint">@color/primaryLightColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:backgroundTint">@color/accentColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:text">Go Back</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_arrow_back_24</item>
     </style>
 
     <style name="CloseButton" parent="ButtonLargeSquare">
-        <item name="backgroundTint">@color/quaternaryDarkColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/accentDarkColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:text">Close</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_close_24</item>
     </style>
 
     <style name="SignInButton" parent="ButtonLargeSquare">
-        <item name="backgroundTint">@color/primaryExtraDarkColor</item>
-        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="backgroundTint">@color/accentColor</item>
+        <item name="android:textColor">@color/lighttextcolor</item>
         <item name="android:drawablePadding">@dimen/padding_md</item>
         <item name="android:drawableLeft">@drawable/ic_baseline_login_24</item>
     </style>
