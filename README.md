@@ -11,7 +11,7 @@
 
 `http://13.237.101.84:8080`
 
-e.g `http://54.253.79.220:8080/search` to use the search endpoint. Complete list of endpoints are described in the `/backend` folder.
+e.g `http://13.237.101.84:8080/search` to use the search endpoint. Complete list of endpoints are described in the `/backend` folder.
 
 ## Server Setup
 
