@@ -457,3 +457,27 @@ func SearchTextHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(payload)
 	}
 }
+
+// vefrify jwt
+func VerifyJWTHandler(w http.ResponseWriter, r *http.Request) {
+
+	// get userID from JWT token
+	userID, _ := r.Context().Value("userID").(int)
+
+	// retrieve user by ID
+	user, err := repo.GetUserByID(userID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+
+		json.NewEncoder(w).Encode(map[string]string{"Error": "User Not Found"}) // send errors as response
+		return
+	}
+
+	user.Password = ""
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	json.NewEncoder(w).Encode(user)
+}
