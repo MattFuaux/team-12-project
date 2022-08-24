@@ -22,14 +22,14 @@ class NetworkRequestController {
     private val logTag = "NetworkRequestController"
 
     private val URL_PREFIX = "http://"
-    private val URL_IP = "54.252.63.41"
+    private val URL_IP = "13.237.101.84"
     private val URL_PORT = "8080"
     private val URL_REGISTER = "$URL_PREFIX$URL_IP:$URL_PORT/register"
     private val URL_LOGIN = "$URL_PREFIX$URL_IP:$URL_PORT/authenticate"
     private val URL_LOGOUT = "$URL_PREFIX$URL_IP:$URL_PORT/logout"
     private val URL_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search"
     private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search-text"
-    private val URL_CHECK_VALID = "$URL_PREFIX$URL_IP:$URL_PORT/check-valid"
+    private val URL_CHECK_VALID = "$URL_PREFIX$URL_IP:$URL_PORT/verify-jwt"
 
 
 

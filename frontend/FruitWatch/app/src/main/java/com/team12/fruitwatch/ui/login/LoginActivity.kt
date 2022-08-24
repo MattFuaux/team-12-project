@@ -160,6 +160,7 @@ class LoginActivity : AppCompatActivity() {
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
+
         checkForValidJWT()
     }
 
