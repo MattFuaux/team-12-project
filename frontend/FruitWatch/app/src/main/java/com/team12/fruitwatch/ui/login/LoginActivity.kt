@@ -153,15 +153,13 @@ class LoginActivity : AppCompatActivity() {
             }
         }
         if (MainActivity.IN_DEVELOPMENT) {
-            email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
+            email.text = Editable.Factory.getInstance().newEditable("janetdoe@mailbox.com")
             password.text = Editable.Factory.getInstance().newEditable("testpassword")
 
             firstname.text = Editable.Factory.getInstance().newEditable("janet")
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
-//        email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
-//        password.text = Editable.Factory.getInstance().newEditable("testpassword")
 
         checkForValidJWT()
     }
