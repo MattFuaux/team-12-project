@@ -214,9 +214,12 @@ class NetworkRequestController {
 
     fun checkIfValid(jwt: String): ResponseData {
         // Make network/server call here
-        val json: JsonObject = JsonObject()
-        json.addProperty("token",jwt)
-        val response = Fuel.post(URL_CHECK_VALID).jsonBody(json).response()
+        val response = Fuel.post(URL_CHECK_VALID).header(Headers.COOKIE to jwt).response()
+        if(response.second.statusCode == 200){
+            val jsonBody = String(response.second.data, Charset.defaultCharset())
+            val jsonResponse = JSONObject(jsonBody)
+            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),jsonResponse.get("firstName").toString()+" "+jsonResponse.get("lastName").toString() ,jwt),response.third.component2())
+        }
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 }
