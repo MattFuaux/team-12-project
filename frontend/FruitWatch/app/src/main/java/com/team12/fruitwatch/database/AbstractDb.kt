@@ -18,14 +18,14 @@ abstract class AbstractDb(context: Context?) {
     protected var database: SQLiteDatabase? = null
     //protected var mSnapshotManager: SnapshotManager
     fun open() {
-        if (database == null || !database!!.isOpen()) {
-            database = databaseHelper.getWritableDatabase()
+        if (database == null || !database!!.isOpen) {
+            database = databaseHelper.writableDatabase
             //mSnapshotManager.setDbFile(File(database!!.getPath()))
         }
     }
 
     fun close() {
-        if (database != null && database!!.isOpen()) databaseHelper.close()
+        if (database != null && database!!.isOpen) databaseHelper.close()
     }
 
     /**
@@ -61,7 +61,7 @@ abstract class AbstractDb(context: Context?) {
     }
 
     fun delete(id: Long): Int {
-        return database!!.delete(tableName, COL_ID + " = " + id, null)
+        return database!!.delete(tableName, "$COL_ID = ?", arrayOf(id.toString()) )
     }
 
     fun deleteAll(): Int {

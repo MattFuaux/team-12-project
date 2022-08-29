@@ -9,7 +9,6 @@
     <ImageView
         android:layout_width="0dp"
         android:layout_height="200dp"
-
         android:layout_margin="@dimen/margin_lg"
         android:id="@+id/frag_res_item_img"
         android:src="@drawable/no_image_default"
@@ -26,7 +25,6 @@
         android:layout_marginTop="@dimen/margin_lg"
         android:textAlignment="center"
         android:textSize="@dimen/font_size_md"
-        android:text="@string/start_new_search"
         style="@style/SearchButton"
         app:layout_constraintEnd_toEndOf="@id/frag_res_view_nutrition_btn"
         app:layout_constraintStart_toStartOf="@id/frag_res_view_nutrition_btn"
@@ -39,7 +37,6 @@
         style="@style/HistoryButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/view_past_searches"
         android:textAlignment="center"
         android:textSize="@dimen/font_size_md"
         app:layout_constraintBottom_toTopOf="@+id/frag_res_view_nutrition_btn"
@@ -54,11 +51,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_lg"
         android:layout_marginBottom="@dimen/margin_lg"
-        android:text="@string/view_nutritional_info"
         android:textAlignment="center"
         android:textSize="@dimen/font_size_md"
         app:layout_constraintBottom_toBottomOf="@+id/frag_res_item_img"
-
         app:layout_constraintStart_toStartOf="parent"
          />
 
@@ -70,10 +65,8 @@
         android:padding="@dimen/padding_lg"
         android:textColor="@color/lighttextcolor"
         android:background="@color/secondaryDarkColor"
-
         android:textSize="@dimen/font_size_xl"
         android:textStyle="bold"
-
         android:text="@string/no_local_prices_found"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

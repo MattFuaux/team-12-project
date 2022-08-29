@@ -61,7 +61,7 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
                 val course = PastSearch(
                     allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),
                     allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)),
-                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
                     allPastSearches.getBlob(allPastSearches.getColumnIndexOrThrow(COL_ITEM_IMAGE)),
                 )
                 coursesHashMap.set(allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),course)
@@ -84,7 +84,7 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
                 val course = PastSearch(
                     allPastSearches.getLong(allPastSearches.getColumnIndexOrThrow("id")),
                     allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)),
-                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                    LocalDateTime.parse( allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
                     allPastSearches.getBlob(allPastSearches.getColumnIndexOrThrow(COL_ITEM_IMAGE))
                 )
                 coursesArrayList.add(course)
@@ -102,7 +102,7 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         val coursesArrayList = ArrayList<String>()
         if(allPastSearches.count > 0){
             allPastSearches.moveToFirst()
-            while (!allPastSearches.isAfterLast()){
+            while (!allPastSearches.isAfterLast){
                 coursesArrayList.add(allPastSearches.getString(allPastSearches.getColumnIndexOrThrow(COL_ITEM_NAME)))
                 allPastSearches.moveToNext()
             }
@@ -145,7 +145,7 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
             val p = PastSearch(
                 pastSearch.getLong(pastSearch.getColumnIndexOrThrow("id")),
                 pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_ITEM_NAME)),
-                LocalDateTime.parse( pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_DATE),
+                LocalDateTime.parse( pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
                 pastSearch.getBlob(pastSearch.getColumnIndexOrThrow(COL_ITEM_IMAGE))
             )
             pastSearch.close()
@@ -178,5 +178,42 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         }catch (e : Exception){
             return false
         }
+    }
+
+    fun deletePastSearch(id: Long): Boolean{
+        open()
+        val result = delete(id)
+        close()
+        return (result == 1)
+    }
+
+    fun checkIfSearchIsNew(name: String): Boolean {
+        open()
+        val search = find("$COL_ITEM_NAME = ?",name)
+        close()
+        return (search == null || search.count <= 0 )
+    }
+
+    fun getPastSearchByItemName(name: String): PastSearch? {
+        open()
+        val pastSearch = find("$COL_ITEM_NAME = ?",name)
+
+        if(pastSearch != null){
+            pastSearch.moveToFirst()
+            val itemImage = pastSearch.getBlob(pastSearch.getColumnIndexOrThrow(COL_ITEM_IMAGE))
+            val p = PastSearch(
+                pastSearch.getLong(pastSearch.getColumnIndexOrThrow("id")),
+                pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_ITEM_NAME)),
+                LocalDateTime.parse( pastSearch.getString(pastSearch.getColumnIndexOrThrow(COL_SEARCH_DATE)),DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                pastSearch.getBlob(pastSearch.getColumnIndexOrThrow(COL_ITEM_IMAGE))
+            )
+            pastSearch.close()
+            close()
+
+            return p
+
+        }
+        close()
+        return null
     }
 }

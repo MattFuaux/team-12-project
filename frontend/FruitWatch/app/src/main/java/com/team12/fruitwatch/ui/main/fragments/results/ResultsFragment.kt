@@ -4,6 +4,7 @@ package com.team12.fruitwatch.ui.main.fragments.results
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -24,6 +25,7 @@ import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.databinding.FragmentResultsBinding
 import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.dialog.nutrition.NutritionDialog
+import com.team12.fruitwatch.ui.main.MainActivity
 import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,8 +73,6 @@ class ResultsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val resultsViewModel = ViewModelProvider(this).get(ResultsViewModel::class.java)
-
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -85,50 +85,57 @@ class ResultsFragment : Fragment() {
 
         pricesTblLay = root.findViewById(R.id.frag_res_item_prices_tbl)
         viewPastSearchesBtn = root.findViewById(R.id.frag_res_view_past_searches_btn)
-        viewPastSearchesBtn.setOnClickListener(){(requireActivity() as FragmentDataLink).openSearchFrag()}
+        viewPastSearchesBtn.setOnClickListener {(requireActivity() as FragmentDataLink).openSearchFrag()}
         viewNutritionBtn = root.findViewById(R.id.frag_res_view_nutrition_btn)
         viewNutritionBtn.setOnClickListener { nutritionDialog?.show() }
 
-        if (requireArguments().containsKey("PAST_SEARCH_REQUEST")){
-            pastSearch = requireArguments().getParcelable<PastSearch>("PAST_SEARCH_REQUEST")
+
+        return root
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        savedInstanceState.putParcelable(MainActivity.SEARCH_RES_KEY,RecentResults.mostRecentSearchResults)
+        savedInstanceState.putParcelable(MainActivity.PAST_RES_KEY,RecentResults.mostRecentPastSearch)
+        super.onSaveInstanceState(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (RecentResults.mostRecentPastSearch != null){
+            pastSearch = RecentResults.mostRecentPastSearch
             predFruitNameTV.text = pastSearch!!.itemName
             itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(pastSearch!!.itemImage,0,pastSearch!!.itemImage!!.size))
         }else{
-            if (requireArguments().containsKey("SEARCH_IMAGE")){
-                itemImgByteArray = requireArguments().getByteArray("SEARCH_IMAGE")
+            if (RecentResults.mostRecentSearchResults != null){
+                itemImgByteArray = getOutputImageFile().readBytes()
                 itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
             }else{
                 itemImgIV.setImageBitmap(null)
             }
         }
-        val results = requireArguments().getParcelable<NetworkRequestController.SearchResults>("SEARCH_RESULTS")
+        val results = RecentResults.mostRecentSearchResults
         Log.d(TAG,"Loading Search Results: ${results.toString()}")
         showSearchResults(results)
-
-        return root
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        requireArguments().clear()
         _binding = null
     }
 
     private fun dispatchTakePictureIntent() {
-        //val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val takePictureIntent = Intent(activity, CameraActivity::class.java)
         try {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         } catch (e: ActivityNotFoundException) {
             // display error state to the user
-            Log.d("HomeFragment","Activity Not Found ${e.toString()}")
+            Log.d("HomeFragment","Activity Not Found $e")
         }
     }
 
     /** Create a File for saving an image or video */
     private fun getOutputImageFile(): File {
-        // path to /data/data/yourapp/app_data/imageDir
         val directory: File = requireContext().getDir("search_images", Context.MODE_PRIVATE)
         // Create imageDir
         return File(directory, "image.png")
@@ -152,9 +159,9 @@ class ResultsFragment : Fragment() {
             if (result.calories != "") {
                 //viewNutritionBtn.visibility = View.VISIBLE
                 if (pastSearch != null) {
-                    nutritionDialog = NutritionDialog(requireContext(), pastSearch!!.itemImage!!, result)
+                    nutritionDialog = NutritionDialog(requireContext(),isInDarkMode(), pastSearch!!.itemImage!!, result)
                 } else {
-                    nutritionDialog = NutritionDialog(requireContext(), itemImgByteArray!!, result)
+                    nutritionDialog = NutritionDialog(requireContext(),isInDarkMode(),itemImgByteArray!!, result)
                 }
 
             }
@@ -217,7 +224,7 @@ class ResultsFragment : Fragment() {
             tableIconCellLayoutParams.setMargins(10)
 
             val storeIcon = ImageView(context)
-            storeIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE;
+            storeIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE
             storeIcon.layoutParams = tableIconCellLayoutParams
             storeIcon.setPadding(horizontalRowPadding,horizontalRowPadding,horizontalRowPadding,horizontalRowPadding)
             storeIcon.setBackgroundColor(resources.getColor(R.color.off_white, null))
@@ -255,7 +262,6 @@ class ResultsFragment : Fragment() {
                 verticalRowPadding
             )
             storePrice.setTextColor(resources.getColor(R.color.white, null))
-//            storePrice.setBackgroundColor(resources.getColor(R.color.green_600, null))
 
             storePrice.text = String.format(
                 Locale.getDefault(),
@@ -280,34 +286,36 @@ class ResultsFragment : Fragment() {
             nearbyBtn.setTextColor(resources.getColor(R.color.lighttextcolor,null))
             nearbyBtn.layoutParams = tableBtnCellLayoutParams
             nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
-//            nearbyBtn.setPadding(
-//                horizontalRowPadding,
-//                verticalRowPadding,
-//                horizontalEndStorePadding,
-//                verticalRowPadding
-//            )
-            nearbyBtn.setOnClickListener(){
+            nearbyBtn.setOnClickListener {
                 val gmmIntentUri: Uri = Uri.parse("geo:0,0?q=${row.storeName}")
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 // Make the Intent explicit by setting the Google Maps package
                 mapIntent.setPackage("com.google.android.apps.maps")
-
                 // Attempt to start an activity that can handle the Intent
                 startActivity(mapIntent)
             }
-
 
             // add table row
             val tableRow = TableRow(context)
             tableRow.gravity = Gravity.CENTER_HORIZONTAL
             tableRow.id = i + 1
             if(tableRow.id %2 ==0){
-                tableRow.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
-                nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentDarkColor,null))
-            }else{
-                tableRow.setBackgroundColor(resources.getColor(R.color.primaryLightColor,null))
-                nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentColor,null))
+                if(isInDarkMode()){
+                    tableRow.setBackgroundColor(resources.getColor(R.color.primaryExtraDarkColor,null))
+                    nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentExtraDarkColor,null))
+                }else{
+                    tableRow.setBackgroundColor(resources.getColor(R.color.primaryColor,null))
+                    nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentDarkColor,null))
+                }
+            }else {
+                if(isInDarkMode()){
+                    tableRow.setBackgroundColor(resources.getColor(R.color.primaryDarkColor,null))
+                    nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentDarkColor,null))
+                }else{
+                    tableRow.setBackgroundColor(resources.getColor(R.color.primaryLightColor, null))
+                    nearbyBtn.setBackgroundColor(resources.getColor(R.color.accentColor, null))
+                }
             }
 
             val tableRowLayoutParams = TableRow.LayoutParams(
@@ -315,24 +323,18 @@ class ResultsFragment : Fragment() {
                 TableRow.LayoutParams.WRAP_CONTENT
             )
             tableRowLayoutParams.gravity = Gravity.CENTER_HORIZONTAL
-//            tableCellLayoutParams.setMargins(
-//                horizontalRowMargin, verticalRowPadding, horizontalRowMargin,
-//                verticalRowPadding
-//            )
 
-
-//            tableRow.setPadding(
-//                horizontalRowPadding,
-//                verticalRowPadding,
-//                horizontalRowPadding,
-//                verticalRowPadding
-//            )
             tableRow.layoutParams = tableRowLayoutParams
             tableRow.addView(storeIcon)
             tableRow.addView(storePrice)
             tableRow.addView(nearbyBtn)
             pricesTblLay.addView(tableRow, tableRowLayoutParams)
         }
+    }
+
+    fun isInDarkMode(): Boolean {
+        return requireActivity().resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
 }

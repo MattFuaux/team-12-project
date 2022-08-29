@@ -6,6 +6,8 @@ import android.widget.RelativeLayout
 import com.airbnb.lottie.LottieAnimationView
 import com.team12.fruitwatch.R
 
+
+
 class LoadingAnimation(private val context: Activity, animationName: String) {
 
     private var lottieAnimationView : LottieAnimationView =   context.findViewById<LottieAnimationView>(R.id.load_snip_loading_anim) as LottieAnimationView
@@ -24,4 +26,9 @@ class LoadingAnimation(private val context: Activity, animationName: String) {
         loadingAnimationLayout.visibility = View.INVISIBLE
         lottieAnimationView.cancelAnimation()
     }
+}
+
+interface LoadingAnimationController {
+    fun onStartLoading()
+    fun onFinishedLoading()
 }

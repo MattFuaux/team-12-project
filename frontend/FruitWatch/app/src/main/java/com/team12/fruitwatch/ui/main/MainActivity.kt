@@ -1,7 +1,6 @@
 package com.team12.fruitwatch.ui.main
 
 import android.Manifest
-
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
@@ -39,8 +38,8 @@ import com.team12.fruitwatch.ui.camera.CameraActivity
 import com.team12.fruitwatch.ui.login.LoginActivity
 import com.team12.fruitwatch.ui.login.LoginViewModel
 import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
+import com.team12.fruitwatch.ui.main.fragments.results.RecentResults
 import com.team12.fruitwatch.ui.main.fragments.results.ResultsFragment
-import com.team12.fruitwatch.ui.main.fragments.settings.SettingsFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,11 +51,13 @@ import java.time.LocalDateTime
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentDataLink , LoadingAnimationController {
 
     private val TAG = "MainActivity"
+    private var pressedTime: Long = 0
 
     companion object {
         const val IN_DEVELOPMENT = false
         lateinit var userInfo: LoggedInUser
-        private var lastSearchResults: NetworkRequestController.SearchResults? = null
+        val PAST_RES_KEY = "PAST_RESULTS"
+        val SEARCH_RES_KEY = "SEARCH_RESULTS"
     }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -64,9 +65,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var userDisplayName: TextView
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navView: NavigationView
-    private lateinit var latestBundle: Bundle
     private lateinit var loadingAnimation: LoadingAnimation
 
+    // Initialise all the elements of the main activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!intent.hasExtra("USER_KEY")) {
@@ -75,7 +76,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         checkCameraPermissions(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        latestBundle = Bundle()
         setSupportActionBar(binding.appBarMain.toolbar)
         val drawerLayout: DrawerLayout = binding.drawerLayout
 
@@ -97,37 +97,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
         userDisplayName = navView.getHeaderView(0).findViewById(R.id.nav_main_subtitle)
         userInfo = intent.getParcelableExtra("USER_KEY")!!
-        userDisplayName.text = userInfo.displayName
+        userDisplayName.text = getString(R.string.welcome, userInfo.displayName)
         loadingAnimation = LoadingAnimation(this, "loading.json")
         insertValidJWT()
     }
 
+    // Inflate the menu; this adds items to the action bar if it is present.
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.app_bar_menu, menu)
+        //menuInflater.inflate(R.menu.app_bar_menu, menu)
         val resultsItem = menu.findItem(R.id.nav_results)
         if(resultsItem != null){
-            resultsItem.isVisible = lastSearchResults != null
+            resultsItem.isVisible = RecentResults.mostRecentSearchResults != null
         }
-
         return true
     }
 
+    // Build the drawer layout menu
     override fun onSupportNavigateUp(): Boolean {
         val navController = navHostFragment.findNavController()
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.main_activity_menu_action_settings -> {
-                startActivity(Intent(this, SettingsFragment::class.java))
-                return true
-            }
+    // Prevent the user from accidentally exiting the app by confirming with an additional button press
+    override fun onBackPressed() {
+        if (pressedTime + 2000 > System.currentTimeMillis()) {
+            super.onBackPressed()
+            finish()
+        } else {
+            Toast.makeText(baseContext, "Press back again to exit", Toast.LENGTH_SHORT).show()
         }
-        return super.onOptionsItemSelected(item)
+        pressedTime = System.currentTimeMillis()
     }
 
+    // Saves most recent search results in case activity is destroyed
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putParcelable(SEARCH_RES_KEY,RecentResults.mostRecentSearchResults)
+        savedInstanceState.putParcelable(PAST_RES_KEY,RecentResults.mostRecentPastSearch)
+    }
+
+    // Restores most recent search results when activity is created after being destroyed
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        RecentResults.mostRecentSearchResults = savedInstanceState.getParcelable(SEARCH_RES_KEY)
+        RecentResults.mostRecentPastSearch = savedInstanceState.getParcelable(PAST_RES_KEY)
+        toggleResultsMenuItemVisibility()
+    }
+
+    // All actions for each of the drawer menu options
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         toggleResultsMenuItemVisibility()
         when (item.itemId) {
@@ -137,10 +154,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_results -> {
                 val navController = navHostFragment.findNavController()
-                if (!latestBundle.isEmpty) {
-                    navController.navigate(R.id.nav_results, latestBundle)
+                if (RecentResults.mostRecentSearchResults != null) {
+                    navController.navigate(R.id.nav_results)
                 } else {
-                    val noRecentSearch = AlertDialog.Builder(this, androidx.appcompat.R.style.Theme_AppCompat_Dialog)
+                    val noRecentSearch = AlertDialog.Builder(this)
                         .setTitle("Nothing to show")
                         .setMessage("You need to conduct a search before looking at the results, do you want to start a search now?")
                         .setPositiveButton("Yes, Search", DialogInterface.OnClickListener { dialog: DialogInterface, i: Int ->
@@ -151,7 +168,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
             R.id.nav_settings -> {
-                //startActivity(Intent(this, SettingsActivity::class.java))
                 val navController = navHostFragment.findNavController()
                 navController.navigate(R.id.nav_settings)
             }
@@ -173,24 +189,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
+    // Toggles the visibility for the 'Results' menu options based on the existence of the search results
     private fun toggleResultsMenuItemVisibility(){
         val resultsItem = navView.menu.findItem(R.id.nav_results)
         if(resultsItem != null) {
-            resultsItem.isVisible = lastSearchResults != null
+            resultsItem.isVisible = RecentResults.mostRecentSearchResults != null
         }
     }
 
+    // Evaluate the visibility of the 'Results' menu options each time the MainActivity is resumed
     override fun onStart() {
         super.onStart()
         toggleResultsMenuItemVisibility()
-        //loadingAnimation.playAnimation(true)
     }
 
+    // Clear the recent results when activity is destroyed
+    override fun onDestroy() {
+        super.onDestroy()
+        RecentResults.mostRecentSearchResults = null
+        RecentResults.mostRecentPastSearch = null
+    }
+
+    // Store the Users JWT on the device to 'auto-login' next time Fruit Watch is re-opened
     private fun insertValidJWT(){
         val SHARED_PREF_NAME :String  = "FWS"
         val TOKEN_PREF_NAME :String = "ult"
@@ -202,6 +226,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Removes the stored JWT when the user logouts
     private fun clearJWT(){
         val SHARED_PREF_NAME :String  = "FWS"
         val TOKEN_PREF_NAME :String = "ult"
@@ -210,8 +235,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.i(TAG,"User Token Cleared")
     }
 
-
-
+    // Check the user has granted the  required Camera Permissions
     private fun checkCameraPermissions(context: Context?) {
         if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
@@ -225,13 +249,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Grabs the most recent item picture
     private fun getSavedImageFileFromInternalStorage(): File {
         val directory: File = applicationContext.getDir("search_images", Context.MODE_PRIVATE)
-        // Create imageDir
         val mypath = File(directory, "image.png")
         return mypath
     }
 
+    // Gets the image taken by the user to start a new search
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -245,42 +270,38 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Starts a search using the name of a previously searched item
     override fun startTextSearch(pastSearch: PastSearch) {
-
         GlobalScope.launch(Dispatchers.IO) {
-            lastSearchResults = NetworkRequestController().startSearchWithItemName(userInfo, pastSearch.itemName!!)
-            latestBundle = Bundle()
-            latestBundle.putParcelable("SEARCH_RESULTS", lastSearchResults)
-            latestBundle.putParcelable("PAST_SEARCH_REQUEST", pastSearch)
+            RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithItemName(userInfo, pastSearch.itemName!!)
+            RecentResults.mostRecentPastSearch = pastSearch
             GlobalScope.launch(Dispatchers.Main) {
                 onFinishedLoading()
                 toggleResultsMenuItemVisibility()
                 val navController = navHostFragment.findNavController()
-                navController.navigate(R.id.nav_results, latestBundle)
+                navController.navigate(R.id.nav_results)
             }
-//            resultsFragment.arguments = bundle
-//            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-//            transaction.addToBackStack(null)
-//            transaction.replace(R.id.nav_host_fragment_content_main, resultsFragment)
-//            transaction.commit()
         }
-
     }
 
+    // Start a new search with a recently taken image
     override fun startImageSearch(imageFile: File) {
         GlobalScope.launch(Dispatchers.IO) {
-            lastSearchResults = NetworkRequestController().startSearchWithImage(userInfo, imageFile)
-            latestBundle = Bundle()
-            if (lastSearchResults!!.name != "Unknown") {
-                val pastSearch = PastSearch(-1L, lastSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
-                pastSearch.id = PastSearchDb(applicationContext).createPastSearchEntry(pastSearch)
-                if (pastSearch.id != -1L) {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        Toast.makeText(applicationContext, "Search History Updated!", Toast.LENGTH_SHORT).show()
+            RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithImage(userInfo, imageFile)
+            if (RecentResults.mostRecentSearchResults!!.name != "Unknown") {
+                val pastSearchDb = PastSearchDb(applicationContext)
+                if (pastSearchDb.checkIfSearchIsNew(RecentResults.mostRecentSearchResults!!.name)){
+                    RecentResults.mostRecentPastSearch = PastSearch(-1L, RecentResults.mostRecentSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
+                    RecentResults.mostRecentPastSearch!!.id = PastSearchDb(applicationContext).createPastSearchEntry(RecentResults.mostRecentPastSearch!!)
+                    if (RecentResults.mostRecentPastSearch!!.id != -1L) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            Toast.makeText(applicationContext, "Search History Updated!", Toast.LENGTH_SHORT).show()
+                        }
+                        Log.d(TAG, "Past Search Result Added!!")
                     }
-                    Log.d(TAG, "Past Search Result Added!!")
+                }else{
+                    RecentResults.mostRecentPastSearch = pastSearchDb.getPastSearchByItemName(RecentResults.mostRecentSearchResults!!.name)!!
                 }
-                latestBundle.putParcelable("PAST_SEARCH_REQUEST", pastSearch)
             }else{
                 val itemUnrecognized = AlertDialog.Builder(applicationContext, androidx.appcompat.R.style.Theme_AppCompat_Dialog)
                     .setTitle("Item Unrecognised")
@@ -291,48 +312,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     ).setNegativeButton("No", null).create()
                 itemUnrecognized.show()
             }
-            latestBundle.putParcelable("SEARCH_RESULTS", lastSearchResults)
-
-//            resultsFragment.arguments = bundle
             GlobalScope.launch(Dispatchers.Main) {
                 onFinishedLoading()
                 toggleResultsMenuItemVisibility()
                 val navController = navHostFragment.findNavController()
-                navController.navigate(R.id.nav_results, latestBundle)
+                navController.navigate(R.id.nav_results)
             }
-
-//            val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-//            transaction.addToBackStack(null)
-//            transaction.replace(R.id.nav_host_fragment_content_main, resultsFragment)
-//            transaction.commit()
-
         }
     }
 
+    // Open the camera to take a picture
     override fun openCamera() {
-        //val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val takePictureIntent = Intent(this, CameraActivity::class.java)
         try {
             startActivityForResult(takePictureIntent, ResultsFragment.REQUEST_IMAGE_CAPTURE)
         } catch (e: ActivityNotFoundException) {
             // display error state to the user
-            Log.d("HomeFragment", "Activity Not Found ${e.toString()}")
+            Log.d("HomeFragment", "Activity Not Found $e")
         }
     }
 
+    // Open the Search Result Fragment
     override fun openSearchFrag() {
         toggleResultsMenuItemVisibility()
         val navController = navHostFragment.findNavController()
         navController.navigate(R.id.nav_search)
     }
 
+    // Show the searching animation
     override fun onStartLoading() {
         loadingAnimation.playAnimation()
     }
 
+    // Hide the searching animation
     override fun onFinishedLoading() {
-        // After loading is done, stop the animation and reset the current view
         loadingAnimation.stopAnimation()
     }
-
 }

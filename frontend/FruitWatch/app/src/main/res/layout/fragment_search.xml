@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".ui.main.fragments.search.SearchFragment">
 
     <ScrollView
@@ -18,11 +17,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/frag_search_past_searches_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            >
-
-        </androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="wrap_content" />
     </ScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout

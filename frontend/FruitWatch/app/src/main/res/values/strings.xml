@@ -1,6 +1,8 @@
 <resources>
+    <!-- App Related Strings -->
     <string name="app_name">Fruit Watch</string>
-    <!-- Strings related to login -->
+
+    <!-- Login Related Strings -->
     <string name="prompt_firstname">Firstname</string>
     <string name="prompt_surname">Surname</string>
     <string name="prompt_email">Email</string>
@@ -9,42 +11,27 @@
     <string name="action_show_registration">Show Registration</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register_and_sign_in">Register and Sign in</string>
-
-    <string name="welcome">"Welcome !"</string>
+    <string name="welcome">"Welcome %s!"</string>
     <string name="invalid_firstname">Not a valid firstname</string>
     <string name="invalid_surname">Not a valid surname</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="check_valid_failed">"Login Session Expired!\nPlease login again"</string>
-
-
     <string name="login_failed">"Login failed"</string>
     <string name="registration_failed">"Registration failed"</string>
     <string name="logout_success">"Log out successful"</string>
     <string name="logout_failed">"Log out failed"</string>
+
+    <!-- Login Related Strings -->
     <string name="title_activity_settings">Fruit Watch Settings</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_main">MainActivity</string>
+
+    <!-- Navigation Related String -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Account Info</string>
     <string name="nav_header_desc">Navigation Menu</string>
     <string name="action_settings">Settings</string>
-
     <string name="content_desc_fruit_watch_logo">Fruit Watch Logo</string>
     <string name="menu_search">Search &amp; History</string>
     <string name="menu_results">Search Results</string>
@@ -54,15 +41,16 @@
     <!-- Button Titles -->
     <string name="view_nutritional_info">Nutritional\nInfo</string>
     <string name="view_past_searches">Search\nHistory</string>
-    <string name="start_search_small">Start Search</string>
-    <string name="start_new_search">New\nSearch</string>
+    <string name="start_search">Start Search</string>
     <string name="local_supermarket_prices">Local Supermarket Prices</string>
     <string name="close">Close</string>
+    <string name="go_back">Go Back</string>
+    <string name="capture">Capture</string>
+    <string name="clear_history">Clear History</string>
     <string name="scanned_item_image">Scanned Item Image</string>
+    <string name="nutritional_info">Scanned Item Image</string>
     <string name="content_desc_scanned_item_image">Scanned Item Image</string>
     <string name="no_local_prices_found">No Local Prices Found!</string>
     <string name="camera_guide_instructions">Take photo with item in the box</string>
     <string name="loading_prices_animation_text">One moment, harvesting prices..</string>
-
-
 </resources>

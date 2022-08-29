@@ -17,11 +17,15 @@
         <item name="android:colorForeground">@color/lighttextcolor</item>
 <!--        <item name="textColorSecondary">@color/accentColor</item>-->
 
-        textColorPrimary
+        <item name="itemTextColor">@color/darktextcolor</item>
+        <item name="itemIconTint">@color/accentColor</item>
+        <item name="subheaderColor">@color/lighttextcolor</item>
+
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/off_white</item>
         <item name="android:navigationBarColor">@color/primaryColor</item>
 
+        <item name="strokeColor">@color/off_black</item>
 
     </style>
 
