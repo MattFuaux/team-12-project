@@ -1,11 +1,5 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="nav_header_vertical_spacing">8dp</dimen>
-    <dimen name="nav_header_height">176dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-
+    <!-- Standard Font Sizes -->
     <dimen name="font_size_xs">8sp</dimen>
     <dimen name="font_size_sm">12sp</dimen>
     <dimen name="font_size_md">16sp</dimen>
@@ -13,7 +7,7 @@
     <dimen name="font_size_xl">24sp</dimen>
     <dimen name="font_size_2xl">28sp</dimen>
 
-
+    <!-- Standard Margin Sizes -->
     <dimen name="margin_xs">1dp</dimen>
     <dimen name="margin_sm">2dp</dimen>
     <dimen name="margin_md">4dp</dimen>
@@ -23,6 +17,7 @@
     <dimen name="margin_3xl">64dp</dimen>
     <dimen name="margin_4xl">128dp</dimen>
 
+    <!-- Standard Padding Sizes -->
     <dimen name="padding_xs">1dp</dimen>
     <dimen name="padding_sm">2dp</dimen>
     <dimen name="padding_md">4dp</dimen>
@@ -30,6 +25,7 @@
     <dimen name="padding_xl">16dp</dimen>
     <dimen name="padding_2xl">32dp</dimen>
 
+    <!-- Standard Radii Sizes -->
     <dimen name="radius_xs">1dp</dimen>
     <dimen name="radius_sm">2dp</dimen>
     <dimen name="radius_md">4dp</dimen>
@@ -38,6 +34,4 @@
     <dimen name="radius_2xl">32dp</dimen>
     <dimen name="radius_3xl">64dp</dimen>
     <dimen name="radius_4xl">128dp</dimen>
-
-
 </resources>

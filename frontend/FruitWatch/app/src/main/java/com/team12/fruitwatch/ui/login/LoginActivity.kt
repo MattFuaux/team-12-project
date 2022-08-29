@@ -55,8 +55,7 @@ class LoginActivity : AppCompatActivity() {
         }
         layoutToggle(false)
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -160,17 +159,16 @@ class LoginActivity : AppCompatActivity() {
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
-
+        email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
+        password.text = Editable.Factory.getInstance().newEditable("testpassword")
         checkForValidJWT()
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
-        // TODO : initiate successful log out experience
+        val welcomeText = getString(R.string.welcome, model.displayName)
         Toast.makeText(
             applicationContext,
-            "$welcome $displayName",
+            welcomeText,
             Toast.LENGTH_LONG
         ).show()
         val intent = Intent(this, MainActivity::class.java)

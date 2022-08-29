@@ -2,7 +2,6 @@ package com.team12.fruitwatch.ui.main.fragments.search
 
 import android.content.DialogInterface
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Bundle
@@ -14,7 +13,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,12 +26,7 @@ import kotlin.math.roundToInt
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
-
-    //private lateinit var dragHelper: ItemTouchHelper
     private lateinit var swipeHelper: ItemTouchHelper
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -41,19 +34,12 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val searchViewModel =
-            ViewModelProvider(this).get(SearchViewModel::class.java)
-
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val displayMetrics: DisplayMetrics = resources.displayMetrics
-        val height = (displayMetrics.heightPixels / displayMetrics.density).toInt()
         val width = (displayMetrics.widthPixels / displayMetrics.density).toInt()
-
         val deleteIcon = resources.getDrawable(R.drawable.ic_baseline_delete_forever_24, null)
-
-
         val pastSearchList: RecyclerView = binding.fragSearchPastSearchesList
         pastSearchList.layoutManager = LinearLayoutManager(context)
         val searchList = PastSearchDb(context).getPastSearchItemModelList()
@@ -72,16 +58,16 @@ class SearchFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 if (direction == ItemTouchHelper.RIGHT) {
                     val pos = viewHolder.adapterPosition
-                    searchList.removeAt(pos)
-                    adapter.notifyItemRemoved(pos)
-
-                    Snackbar.make(
-                        view!!.findViewById(R.id.card_past_search_root_layout),
-                         "Deleted",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    if(PastSearchDb(context).deletePastSearch(searchList[pos].id!!)){
+                        searchList.removeAt(pos)
+                        adapter.notifyItemRemoved(pos)
+                        Snackbar.make(
+                            view!!.findViewById(R.id.card_past_search_root_layout),
+                            "Deleted",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-
             }
 
             override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
@@ -128,7 +114,7 @@ class SearchFragment : Fragment() {
         swipeHelper.attachToRecyclerView(pastSearchList)
 
         val clearSearchHistoryButton = root.findViewById<Button>(R.id.frag_search_clear_history_btn)
-        clearSearchHistoryButton.setOnClickListener(){
+        clearSearchHistoryButton.setOnClickListener {
             val noRecentSearch = AlertDialog.Builder(requireContext(), androidx.appcompat.R.style.Theme_AppCompat_Dialog)
                 .setTitle("Clear Entire History")
                 .setMessage("Are you sure you want to clear your entire search history?\nThis cannot be undone")
@@ -144,10 +130,9 @@ class SearchFragment : Fragment() {
         }
 
         val startSearchButton = root.findViewById<Button>(R.id.frag_search_take_pic_btn)
-        startSearchButton.setOnClickListener(){
+        startSearchButton.setOnClickListener {
             (activity as FragmentDataLink).openCamera()
         }
-
         return root
     }
 

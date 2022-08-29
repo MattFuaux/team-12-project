@@ -87,8 +87,8 @@ class CameraPreview(
         Log.d(TAG,"Rotation: $rotation")
         Log.d(TAG,"Display Orientation: $result")
         val parameters = camera.parameters
-        parameters.setRotation(result);
-        camera.setParameters(parameters);
+        parameters.setRotation(result)
+        camera.parameters = parameters
         camera.setDisplayOrientation(result)
     }
 }

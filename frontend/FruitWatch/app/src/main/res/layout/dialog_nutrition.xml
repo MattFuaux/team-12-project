@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/diag_nutrition_of_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="@dimen/font_size_md"
+        android:textStyle="bold"
+        android:text="Nutritional Information"
+        android:padding="@dimen/padding_lg"
+        android:layout_marginBottom="@dimen/margin_lg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/diag_nutrition_title"
+        android:textColor="@color/lighttextcolor"
+        android:background="@color/secondaryColor"
+        />
+
+    <TextView
+        android:id="@+id/diag_nutrition_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="@dimen/font_size_xl"
+        android:textStyle="bold"
+        android:padding="@dimen/padding_lg"
+        android:layout_marginBottom="@dimen/margin_lg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/lighttextcolor"
+        android:background="@color/secondaryDarkColor"
+        />
+
+    <ImageView
+        android:id="@+id/diag_nutrition_item_img"
+        android:layout_marginTop="@dimen/margin_lg"
+        android:layout_marginBottom="@dimen/margin_lg"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/diag_nutrition_of_title"
+        android:contentDescription="@string/scanned_item_image" />
+
+    <TableLayout
+        android:id="@+id/diag_nutrition_info_tbl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_lg"
+        android:layout_marginBottom="@dimen/margin_lg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/diag_nutrition_item_img" />
+
+    <Button
+        android:id="@+id/diag_nutrition_close_btn"
+        style="@style/CloseButton"
+        app:layout_constraintEnd_toEndOf="@+id/diag_nutrition_info_tbl"
+        app:layout_constraintStart_toStartOf="@+id/diag_nutrition_info_tbl"
+        app:layout_constraintTop_toBottomOf="@+id/diag_nutrition_info_tbl" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

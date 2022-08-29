@@ -18,19 +18,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FruitWatch">
+
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.FruitWatch.NoActionBar"
-            />
+            android:theme="@style/Theme.FruitWatch.NoActionBar" />
 
         <activity
             android:name="com.team12.fruitwatch.ui.main.fragments.settings.SettingsFragment"
             android:exported="false"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_settings" />
+
         <activity
             android:name=".ui.login.LoginActivity"
             android:screenOrientation="portrait"
@@ -42,6 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.camera.CameraActivity"
             android:exported="false"

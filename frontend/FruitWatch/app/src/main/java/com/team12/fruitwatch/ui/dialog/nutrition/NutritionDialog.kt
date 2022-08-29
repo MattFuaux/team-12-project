@@ -15,6 +15,7 @@ import java.util.*
 
 class NutritionDialog(
     context: Context,
+    private val isInDarkMode: Boolean,
     private var imageByteArray: ByteArray,
     private var resultNutrition: NetworkRequestController.SearchResults
 ) : Dialog(context) {
@@ -24,6 +25,7 @@ class NutritionDialog(
     private lateinit var titleTV: TextView
     private lateinit var closeBtn: Button
 
+    // Represent the nutritional data as an object to make it easily convertible to the nutrition table rows
     class NutritionData {
         var nutrition: String = String()
         var value: Double = 0.00
@@ -31,23 +33,26 @@ class NutritionDialog(
     }
 
     init {
+        // Remove the ability for the user to close the dialog by tapping outside the dialog, to force them to use the close button
         setCancelable(false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.nutrition_dialog)
+        setContentView(R.layout.dialog_nutrition)
         itemIV = findViewById(R.id.diag_nutrition_item_img)
         itemIV.setImageBitmap(BitmapFactory.decodeByteArray(imageByteArray,0,imageByteArray.size))
         closeBtn = findViewById(R.id.diag_nutrition_close_btn)
         closeBtn.setOnClickListener { dismiss() }
         infoTbl = findViewById(R.id.diag_nutrition_info_tbl)
         titleTV = findViewById(R.id.diag_nutrition_title)
-        titleTV.text = resultNutrition.name
+        val title = " ${resultNutrition.name}"
+        titleTV.text = title
         loadNutritionData(resultNutrition)
     }
 
+    // Build the table 0f nutritional information from the supplied search results
     private fun loadNutritionData(resultNutrition: NetworkRequestController.SearchResults) {
         val horizontalRowMargin = context.resources.getDimension(R.dimen.margin_sm).toInt()
         val verticalRowPadding = context.resources.getDimension(R.dimen.padding_sm).toInt()
@@ -81,15 +86,9 @@ class NutritionDialog(
                     horizontalEndNutritionPadding,
                     verticalRowPadding
                 )
-
-                nutritionTitle.setBackgroundColor(
-                    context.resources.getColor(
-                        R.color.teal_100,
-                        null
-                    )
-                )
                 nutritionTitle.setTextColor(context.resources.getColor(R.color.black, null))
                 nutritionTitle.text = row!!.nutrition
+
                 val nutritionValue = TextView(context)
                 nutritionValue.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
                 nutritionValue.setTextSize(TypedValue.COMPLEX_UNIT_PX, valueTextSize.toFloat())
@@ -105,12 +104,35 @@ class NutritionDialog(
                     verticalRowPadding
                 )
                 nutritionValue.setTextColor(context.resources.getColor(R.color.white, null))
-                nutritionValue.setBackgroundColor(
-                    context.resources.getColor(
-                        R.color.teal_600,
-                        null
+
+                if(isInDarkMode){
+                    nutritionTitle.setBackgroundColor(
+                        context.resources.getColor(
+                            R.color.primaryColor,
+                            null
+                        )
                     )
-                )
+                    nutritionValue.setBackgroundColor(
+                        context.resources.getColor(
+                            R.color.primaryDarkColor,
+                            null
+                        )
+                    )
+                }else{
+                    nutritionTitle.setBackgroundColor(
+                        context.resources.getColor(
+                            R.color.primaryExtraLightColor,
+                            null
+                        )
+                    )
+                    nutritionValue.setBackgroundColor(
+                        context.resources.getColor(
+                            R.color.primaryLightColor,
+                            null
+                        )
+                    )
+                }
+
                 nutritionValue.text = String.format(
                     Locale.getDefault(),
                     "%s%s",
@@ -118,7 +140,6 @@ class NutritionDialog(
                     row.unit
                 )
 
-                // add table row
                 val tblRow = TableRow(context)
                 tblRow.gravity = Gravity.CENTER
                 tblRow.id = i + 1
@@ -144,6 +165,7 @@ class NutritionDialog(
         }
     }
 
+    // Convert the nutritional data into row to be displayed
     private fun processNutrition(resultNutrition: NetworkRequestController.SearchResults): Array<NutritionData?> {
 
         val data: Array<NutritionData?> = arrayOfNulls(11)
@@ -203,6 +225,7 @@ class NutritionDialog(
         return data
     }
 
+    // Create a single row for a piece of nutrition data
     private fun createNutritionRow(title: String, value:Double, unit:String): NutritionData {
         val row = NutritionData()
         row.nutrition = title

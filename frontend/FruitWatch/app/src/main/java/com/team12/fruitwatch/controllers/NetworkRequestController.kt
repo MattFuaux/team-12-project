@@ -6,11 +6,9 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.*
 import com.github.kittinunf.fuel.gson.jsonBody
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.ui.main.MainActivity
-import kotlinx.coroutines.delay
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
 import java.io.File
@@ -19,7 +17,7 @@ import java.nio.charset.Charset
 
 class NetworkRequestController {
 
-    private val logTag = "NetworkRequestController"
+    private val TAG = "NetworkRequestController"
 
     private val URL_PREFIX = "http://"
     private val URL_IP = "13.237.101.84"
@@ -30,8 +28,6 @@ class NetworkRequestController {
     private val URL_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search"
     private val URL_TEXT_SEARCH = "$URL_PREFIX$URL_IP:$URL_PORT/search-text"
     private val URL_CHECK_VALID = "$URL_PREFIX$URL_IP:$URL_PORT/verify-jwt"
-
-
 
     private val TEST_JSON_DATA_NUTRITIONAL_INFO =
             "\"name\":\"Navel Orange\"," +
@@ -47,7 +43,7 @@ class NetworkRequestController {
             "\"calcium_mg\": 60.2"
 
     private val TEST_JSON_DATA_SUPERMARKET_PRICES = "{" +
-            "\"store\": \"ALDI\"," +
+            "\"store\": \"IGA\"," +
             "\"price\": 2.32," +
             "\"date\": 2022-06-25," +
             "\"quantity\": \"kg\"" +
@@ -69,9 +65,7 @@ class NetworkRequestController {
     private val TEST_JSON_DATA_RESULTS = "{\"prices\":[" +
             TEST_JSON_DATA_SUPERMARKET_PRICES +
             "]," +
-//            "\"nutrition\":{" +
             TEST_JSON_DATA_NUTRITIONAL_INFO +
-//            "}" +
             "}"
 
     data class ResponseData(
@@ -115,26 +109,10 @@ class NetworkRequestController {
         }
         }
 
-    data class ItemNutrition(
-        val name:String?,
-        val calories:String?,
-        val carbohydrates_total_g:String?,
-        val cholesterol_mg:String?,
-        val fat_saturated_g:String?,
-        val fat_total_g:String?,
-        val fiber_g:String?,
-        val potassium_mg:String?,
-        val protein_g:String?,
-        val serving_size_g:String?,
-        val sodium_mg:String?,
-        val sugar_g:String?
-        )
     @Parcelize
     data class SearchResults(
         @SerializedName("prices")
         val prices: List<StorePrice>?,
-//        @SerializedName("nutrition")
-//        val nutrition: ItemNutrition?
         val name:String,
         val calories:String?,
         val carbohydrates_total_g:String?,
@@ -154,71 +132,83 @@ class NetworkRequestController {
         }
         }
 
+    // Makes server request to start a search of a previously searched item with the name of the item provided,
+    // this will not return an error because it is searching with an item name that the server has already recognised
     fun startSearchWithItemName(loggedInUser: LoggedInUser, itemNameToSearch: String): SearchResults {
         val resultObject : SearchResults
-        if(!MainActivity.IN_DEVELOPMENT) {
-            // Make network/server call here
-            //val parameters = listOf<Pair<String,Any?>>(Pair("itemName",itemNameToSearch))
+        if(MainActivity.IN_DEVELOPMENT) {
+            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, enable "IN_DEVELOPMENT" mode to use this dummy data
+            resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+        }else{
             val response = Fuel.post(URL_TEXT_SEARCH)
                 .header(Headers.COOKIE to loggedInUser.jwt).jsonBody(TextSearchDetails(itemNameToSearch)).response()
             val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
-            resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-        }else{
-            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
             resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
         }
         return resultObject
     }
 
+    // Makes server request to start a new search with the image provided,
+    // this will not return an error, but it may return an incorrectly recognised result
     fun startSearchWithImage(loggedInUser: LoggedInUser, imageToPredict: File): SearchResults {
         val resultObject : SearchResults
-        if(!MainActivity.IN_DEVELOPMENT) {
-            // Make network/server call here
+        if(MainActivity.IN_DEVELOPMENT) {
+            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, enable "IN_DEVELOPMENT" mode to use this dummy data
+            resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
+        }else{
             val dataPart: DataPart = FileDataPart(imageToPredict)
             val response = Fuel.upload(URL_SEARCH, Method.POST).add(dataPart)
                 .header(Headers.COOKIE to loggedInUser.jwt).response()
             val searchResultsJSON = String(response.second.data, Charset.defaultCharset())
             resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
-        }else{
-            val searchResultsJSON = TEST_JSON_DATA_RESULTS // Test dummy data is used here, uncomment line above to actually send a request to the server
-            resultObject = Gson().fromJson(searchResultsJSON,SearchResults::class.java)
         }
         return resultObject
     }
 
+    // Makes server request to attempt to validate the provided registration details,
+    // otherwise return the reported error
     fun registerUser(firstname:String, surname: String, email:String, password: String): ResponseData {
-        // Make network/server call here
         val response = Fuel.post(URL_REGISTER).jsonBody(RegistrationDetails(firstname,surname,email,password)).response()
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 
+    // Makes server request to attempt to validate the provided login details,
+    // otherwise return the reported error
     fun loginUser(email:String, password: String): ResponseData {
-        // Make network/server call here
         val response = Fuel.post(URL_LOGIN).jsonBody(LoginDetails(email,password)).response()
         if(response.second.statusCode == 200 && response.second.header("Set-Cookie").isNotEmpty()){
             val cookieHeader = (response.second.headers["Set-Cookie"] as List<String>)[0]
             val cookie = cookieHeader.split(";")[0]
             val jsonBody = String(response.second.data, Charset.defaultCharset())
             val jsonResponse = JSONObject(jsonBody)
-            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),jsonResponse.get("firstName").toString()+" "+jsonResponse.get("lastName").toString() ,cookie),response.third.component2())
+            val dispName: StringBuilder = StringBuilder(jsonResponse.get("firstName").toString())
+            dispName.setCharAt(0, dispName[0].uppercaseChar())
+            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),dispName.toString() ,cookie),response.third.component2())
         }
 
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 
+    // Makes server request to attempt to logout the user and if the cookie in the response is empty
+    // then the logout was successful, otherwise return the reported error
     fun logoutUser(jwt: String): ResponseData {
-        // Make network/server call here
-        val response = Fuel.post(URL_LOGOUT).response()
+        val response = Fuel.post(URL_LOGOUT).header(Headers.COOKIE to jwt).response()
+        if(response.second.statusCode == 200 && response.second.header("Set-Cookie").isEmpty()){
+            return ResponseData(response.second.statusCode,null,response.third.component2())
+        }
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }
 
+    // Makes a request to the server to check if the users saved JWT has not expired
+    // and is valid in order to auto-login the user
     fun checkIfValid(jwt: String): ResponseData {
-        // Make network/server call here
         val response = Fuel.post(URL_CHECK_VALID).header(Headers.COOKIE to jwt).response()
         if(response.second.statusCode == 200){
             val jsonBody = String(response.second.data, Charset.defaultCharset())
             val jsonResponse = JSONObject(jsonBody)
-            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),jsonResponse.get("firstName").toString()+" "+jsonResponse.get("lastName").toString() ,jwt),response.third.component2())
+            val dispName: StringBuilder = StringBuilder(jsonResponse.get("firstName").toString())
+            dispName.setCharAt(0, dispName[0].uppercaseChar())
+            return ResponseData(response.second.statusCode,LoggedInUser(jsonResponse.get("userID").toString(),dispName.toString(),jwt),response.third.component2())
         }
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }

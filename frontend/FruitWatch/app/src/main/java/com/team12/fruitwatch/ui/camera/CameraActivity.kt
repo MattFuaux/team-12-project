@@ -10,6 +10,7 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.hardware.Camera
 import android.hardware.Camera.PictureCallback
+import android.os.Build
 import androidx.exifinterface.media.ExifInterface
 import android.os.Bundle
 import android.util.Log
@@ -95,7 +96,11 @@ class CameraActivity : Activity() {
             if(size.width == 1280 && size.height == 720){
                 Log.i(TAG,"Setting Picture Size to preferred size of: ${size.width}X${size.height}")
                 parameters.setPictureSize(size.width,size.height)
-                if(display!!.rotation == 2 || display!!.rotation == 0) {
+                if(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        display!!.rotation == 2 || display!!.rotation == 0
+                    } else {
+                        requestedOrientation == 2 || requestedOrientation == 0
+                    }) {
                     reductionFactor =
                         size.width.toDouble() / resources.displayMetrics.heightPixels.toDouble()
                 }else{
@@ -109,14 +114,19 @@ class CameraActivity : Activity() {
             val sortedPicturesSizes = parameters.supportedPictureSizes.sortedBy { it.width*it.height}
             Log.i(TAG,"Setting Picture Size to: ${sortedPicturesSizes.last().width}X${sortedPicturesSizes.last().height}")
             parameters.setPictureSize(sortedPicturesSizes.last().width,sortedPicturesSizes.last().height)
-            if(display!!.rotation == 2 || display!!.rotation == 0) {
+            if(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    display!!.rotation == 2 || display!!.rotation == 0
+                } else {
+                    requestedOrientation == 2 || requestedOrientation == 0
+                }
+            ) {
                 reductionFactor = sortedPicturesSizes.last().width.toDouble()/resources.displayMetrics.heightPixels.toDouble()
             }else{
                 reductionFactor = sortedPicturesSizes.last().width.toDouble()/resources.displayMetrics.widthPixels.toDouble()
             }
 
         }
-        camera!!.setParameters(parameters);
+        camera!!.parameters = parameters
         parameters.supportedPictureSizes
 
         Log.i(TAG,"ReductionFactor is: $reductionFactor")
@@ -160,7 +170,7 @@ class CameraActivity : Activity() {
         try {
             postProcessedFOS = FileOutputStream(targetFile)
             // Use the compress method on the BitMap object to write image to the OutputStream
-            processedBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, postProcessedFOS)
+            processedBitmap.compress(Bitmap.CompressFormat.PNG, 100, postProcessedFOS)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
             return false
@@ -169,7 +179,7 @@ class CameraActivity : Activity() {
                 postProcessedFOS?.close()
             } catch (e: IOException) {
                 e.printStackTrace()
-                return false
+
             }
         }
         return true
