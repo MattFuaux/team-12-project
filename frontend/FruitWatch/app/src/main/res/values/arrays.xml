@@ -1,12 +1,15 @@
 <resources>
-    <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <!-- Past Search List Length Preference -->
+    <string-array name="past_search_list_length">
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="past_search_list_length_items">
+        <item>20 items</item>
+        <item>25 items</item>
+        <item>30 items</item>
     </string-array>
+
 </resources>

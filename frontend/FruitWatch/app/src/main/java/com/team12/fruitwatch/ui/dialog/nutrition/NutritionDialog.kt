@@ -18,7 +18,7 @@ class NutritionDialog(
     private val isInDarkMode: Boolean,
     private var imageByteArray: ByteArray,
     private var resultNutrition: NetworkRequestController.SearchResults
-) : Dialog(context) {
+) : Dialog(context,R.style.Theme_FruitWatch_Dialog){
 
     private lateinit var itemIV: ImageView
     private lateinit var infoTbl: TableLayout

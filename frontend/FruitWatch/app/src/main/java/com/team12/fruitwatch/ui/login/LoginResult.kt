@@ -1,7 +1,7 @@
 package com.team12.fruitwatch.ui.login
 
 /**
- * Authentication result : success (user details) or error message.
+ * Login result : success (user details) or error message.
  */
 data class LoginResult(
     val success: LoggedInUserView? = null,

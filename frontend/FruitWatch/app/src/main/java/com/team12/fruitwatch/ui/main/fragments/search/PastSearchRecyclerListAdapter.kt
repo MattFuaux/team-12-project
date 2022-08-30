@@ -22,6 +22,8 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+
+// Maps PastSearch objects to the list of past searches on the SearchFragment
 class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>, private val activity: Activity) : RecyclerView.Adapter<PastSearchRecyclerListAdapter.ViewHolder>() {
 
     class ViewHolder(PastSearch: View) : RecyclerView.ViewHolder(PastSearch) {
@@ -42,7 +44,7 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
         holder.itemDateSearched.text = getDaysBetweenDate(pastSearch.itemSearchDate!!)
         holder.itemImage.setImageBitmap(BitmapFactory.decodeByteArray(pastSearch.itemImage,0,pastSearch.itemImage!!.size))
         holder.rootLayout.setOnClickListener {
-            val confirm = AlertDialog.Builder(holder.itemView.context!!)
+            val confirm = AlertDialog.Builder(holder.itemView.context!!,R.style.Theme_FruitWatch_Dialog)
                 .setTitle("Start Search")
                 .setMessage("Are you sure you want to search for this item again?")
                 .setPositiveButton("Yes, Search", DialogInterface.OnClickListener { dialog: DialogInterface, i: Int ->
@@ -54,12 +56,11 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
     }
 
     private fun searchForItem(pastSearch: PastSearch){
-        GlobalScope.launch(Dispatchers.Main) {
-            (activity as LoadingAnimationController).onStartLoading()
-            (activity as FragmentDataLink).startTextSearch(pastSearch)
-        }
+        (activity as LoadingAnimationController).onStartLoading()
+        (activity as FragmentDataLink).startTextSearch(pastSearch)
     }
 
+    // Calculates the days since last searched
     private fun getDaysBetweenDate(dateOne : LocalDateTime): String{
         // Finding the absolute difference between
         // the current date and date given (in seconds)

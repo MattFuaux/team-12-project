@@ -12,7 +12,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -23,6 +22,7 @@ import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.databinding.ActivityLoginBinding
 import com.team12.fruitwatch.ui.main.MainActivity
 import kotlinx.coroutines.*
+import org.aviran.cookiebar2.CookieBar
 
 class LoginActivity : AppCompatActivity() {
 
@@ -55,7 +55,8 @@ class LoginActivity : AppCompatActivity() {
         }
         layoutToggle(false)
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
+        loginViewModel = ViewModelProvider(this,LoginViewModelFactory())[LoginViewModel::class.java]
+
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -159,27 +160,29 @@ class LoginActivity : AppCompatActivity() {
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
-        email.text = Editable.Factory.getInstance().newEditable("camakers2010@gmail.com")
-        password.text = Editable.Factory.getInstance().newEditable("testpassword")
         checkForValidJWT()
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcomeText = getString(R.string.welcome, model.displayName)
-        Toast.makeText(
-            applicationContext,
-            welcomeText,
-            Toast.LENGTH_LONG
-        ).show()
+        MainActivity.showLoginGreeting = true
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("USER_KEY", LoggedInUser(model.userId, model.displayName,model.jwt))
         startActivity(intent)
     }
 
+
     private fun showLoginFailed(@StringRes errorString: Int) {
-        Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+        CookieBar.build(this)
+            .setTitle(errorString)
+            .setBackgroundColor(R.color.red_500)
+            .setIcon(R.drawable.ic_baseline_clear_24)
+            .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+            .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+            .setDuration(4000) 
+            .show()
     }
 
+    // Show/hides the login or registration input boxes depending on the UI switch position
     private fun layoutToggle(showRegistrationLayout: Boolean){
         if(showRegistrationLayout) {
             firstname.visibility = View.VISIBLE
