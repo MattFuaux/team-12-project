@@ -16,9 +16,9 @@ import java.io.File
  */
 class SearchUnitTest {
 
-    val fileBanana = Mockito.mock(File::class.java)
-    val filePomegranate = Mockito.mock(File::class.java)
-    val fileMangosteen = Mockito.mock(File::class.java)
+    val fileBanana: File = Mockito.mock(File::class.java)
+    val filePomegranate: File = Mockito.mock(File::class.java)
+    val fileMangosteen: File = Mockito.mock(File::class.java)
 
     val user :LoggedInUser = LoggedInUser("1","Jane Doe","jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTQ0OTg1MjIsImlzcyI6IjIifQ.bPsJ3s5t7EtRc-BfImZlqIo45tbYLo6IGTZpHNpb0QA")
 
@@ -28,18 +28,18 @@ class SearchUnitTest {
     fun setup(){
         networkRequestController = Mockito.mock(NetworkRequestController::class.java)
         BDDMockito.given(
-            networkRequestController.startSearch(user, fileBanana)
+            networkRequestController.startSearchWithImage(user, fileBanana)
         ).willReturn(
             NetworkRequestController.SearchResults(null,"Banana",null,null,null,null,null,null,null,null,null,null,null)
         )
 
         BDDMockito.given(
-            networkRequestController.startSearch(user, filePomegranate)
+            networkRequestController.startSearchWithImage(user, filePomegranate)
         ).willReturn(
             NetworkRequestController.SearchResults(null,"Pomegranate",null,null,null,null,null,null,null,null,null,null,null)
         )
         BDDMockito.given(
-            networkRequestController.startSearch(user, fileMangosteen)
+            networkRequestController.startSearchWithImage(user, fileMangosteen)
         ).willReturn(
             NetworkRequestController.SearchResults(null,"Mangosteen",null,null,null,null,null,null,null,null,null,null,null)
         )
@@ -47,20 +47,20 @@ class SearchUnitTest {
 
     @Test
     fun loginSuccess() {
-        val result = networkRequestController.startSearch(user, fileBanana)
+        val result = networkRequestController.startSearchWithImage(user, fileBanana)
         assertEquals("Banana",result.name)
     }
 
 
     @Test
     fun loginMissingEmail() {
-        val result = networkRequestController.startSearch(user, filePomegranate)
+        val result = networkRequestController.startSearchWithImage(user, filePomegranate)
         assertEquals("Pomegranate",result.name)
     }
 
     @Test
     fun loginMissingPassword() {
-        val result = networkRequestController.startSearch(user, fileMangosteen)
+        val result = networkRequestController.startSearchWithImage(user, fileMangosteen)
         assertEquals("Mangosteen",result.name)
     }
 }

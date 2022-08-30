@@ -1,38 +1,39 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.FruitWatch" parent="Theme.AppCompat">
+    <style name="Theme.FruitWatch" parent="Theme.AppCompat.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
-        <item name="colorOnSurface">@color/lighttextcolor</item>
-        <!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
-        <item name="colorSecondary">@color/secondaryColor</item>
-        <item name="colorSecondaryVariant">@color/secondaryLightColor</item>
-        <item name="colorOnSecondary">@color/lighttextcolor</item>
-        <!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
-        <item name="android:statusBarColor" >@color/primaryDarkColor</item>
-        <!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
-        <item name="colorAccent">@color/accentColor</item>
+        <item name="colorPrimary">@color/primaryDarkColor</item>
+        <item name="colorPrimaryVariant">@color/primaryColor</item>
+        <item name="colorOnSurface">@color/darktextcolor</item>
 
+        <item name="colorSecondary">@color/secondaryDarkColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryColor</item>
+        <item name="colorOnSecondary">@color/lighttextcolor</item>
+
+        <item name="android:statusBarColor">@color/primaryExtraDarkColor</item>
+        <item name="colorAccent">@color/accentDarkColor</item>
         <item name="android:colorForeground">@color/lighttextcolor</item>
-        <!--        <item name="textColorSecondary">@color/accentColor</item>-->
 
         <item name="itemTextColor">@color/lighttextcolor</item>
-        <item name="itemIconTint">@color/accentColor</item>
+        <item name="itemIconTint">@color/accentDarkColor</item>
         <item name="subheaderColor">@color/darktextcolor</item>
 
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/off_black</item>
         <item name="android:navigationBarColor">@color/primaryDarkColor</item>
-
         <item name="strokeColor">@color/off_white</item>
-
-
-
     </style>
 
-<!--    <style name="ThemeOverlay.FruitWatch.FullscreenContainer" parent="">-->
-<!--        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>-->
-<!--        <item name="fullscreenTextColor">@color/light_blue_A400</item>-->
-<!--    </style>-->
+    <style name="Theme.FruitWatch.Dialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:windowBackground">@color/off_black</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:colorForeground">@color/lighttextcolor</item>
+    </style>
+
+    <style name="Theme.FruitWatch.NoActionBar" parent="Theme.FruitWatch">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.FruitWatch.AppBarOverlay" parent="Theme.FruitWatch" />
 </resources>

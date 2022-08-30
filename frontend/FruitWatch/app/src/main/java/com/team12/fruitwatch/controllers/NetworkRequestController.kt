@@ -193,8 +193,12 @@ class NetworkRequestController {
     // then the logout was successful, otherwise return the reported error
     fun logoutUser(jwt: String): ResponseData {
         val response = Fuel.post(URL_LOGOUT).header(Headers.COOKIE to jwt).response()
-        if(response.second.statusCode == 200 && response.second.header("Set-Cookie").isEmpty()){
-            return ResponseData(response.second.statusCode,null,response.third.component2())
+        if(response.second.statusCode == 200 && response.second.header("Set-Cookie").isNotEmpty()){
+            val cookieHeader = (response.second.headers["Set-Cookie"] as List<String>)[0]
+            val cookie = cookieHeader.split(";")[0]
+            if(cookie.length == 4){ // If the length of cookie is 4 the the JWT was cleared
+                return ResponseData(response.second.statusCode,null,response.third.component2())
+            }
         }
         return ResponseData(response.second.statusCode,String(response.second.data, Charset.defaultCharset()),response.third.component2())
     }

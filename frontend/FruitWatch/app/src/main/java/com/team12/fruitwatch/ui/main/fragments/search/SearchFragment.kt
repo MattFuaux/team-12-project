@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -21,6 +20,7 @@ import com.team12.fruitwatch.R
 import com.team12.fruitwatch.database.entitymanager.PastSearchDb
 import com.team12.fruitwatch.databinding.FragmentSearchBinding
 import com.team12.fruitwatch.ui.main.fragments.FragmentDataLink
+import org.aviran.cookiebar2.CookieBar
 import kotlin.math.roundToInt
 
 class SearchFragment : Fragment() {
@@ -28,6 +28,8 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private lateinit var swipeHelper: ItemTouchHelper
     private val binding get() = _binding!!
+    private lateinit var pastSearchList: RecyclerView
+    private lateinit var emptySearchListImg: View
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,19 +42,19 @@ class SearchFragment : Fragment() {
         val displayMetrics: DisplayMetrics = resources.displayMetrics
         val width = (displayMetrics.widthPixels / displayMetrics.density).toInt()
         val deleteIcon = resources.getDrawable(R.drawable.ic_baseline_delete_forever_24, null)
-        val pastSearchList: RecyclerView = binding.fragSearchPastSearchesList
+        pastSearchList = binding.fragSearchPastSearchesList
         pastSearchList.layoutManager = LinearLayoutManager(context)
         val searchList = PastSearchDb(context).getPastSearchItemModelList()
         val adapter = PastSearchRecyclerListAdapter(searchList, requireActivity())
         pastSearchList.adapter = adapter
-
+        emptySearchListImg = binding.fragSearchEmptyListImg
         swipeHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             0,
             ItemTouchHelper.RIGHT
         ) {
             //more code here
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-              return false
+                return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -61,11 +63,15 @@ class SearchFragment : Fragment() {
                     if(PastSearchDb(context).deletePastSearch(searchList[pos].id!!)){
                         searchList.removeAt(pos)
                         adapter.notifyItemRemoved(pos)
-                        Snackbar.make(
-                            view!!.findViewById(R.id.card_past_search_root_layout),
-                            "Deleted",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
+                        CookieBar.build(activity)
+                            .setTitle("History Item Deleted")
+                            .setBackgroundColor(R.color.red_500)
+                            .setIcon(R.drawable.ic_baseline_check_24)
+                            .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                            .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                            .setDuration(3000) 
+                            .show()
+                        toggleEmptySearchListImage()
                     }
                 }
             }
@@ -91,13 +97,13 @@ class SearchFragment : Fragment() {
                         val iconLeft = textMargin
                         deleteIcon.bounds = Rect(
                             textMargin,
-                             viewHolder.itemView.top + 30,
+                            viewHolder.itemView.top + 30,
                             textMargin + deleteIcon.intrinsicWidth,
                             viewHolder.itemView.top + deleteIcon.intrinsicHeight
                                     + (textMargin*2)
                         )
                         //3. Drawing icon and text
-                       deleteIcon.draw(c)
+                        deleteIcon.draw(c)
                         val paint = Paint()
                         paint.textSize = resources.getDimension(R.dimen.font_size_md)
                         paint.color = resources.getColor(R.color.off_white,null)
@@ -115,14 +121,22 @@ class SearchFragment : Fragment() {
 
         val clearSearchHistoryButton = root.findViewById<Button>(R.id.frag_search_clear_history_btn)
         clearSearchHistoryButton.setOnClickListener {
-            val noRecentSearch = AlertDialog.Builder(requireContext(), androidx.appcompat.R.style.Theme_AppCompat_Dialog)
+            val noRecentSearch = AlertDialog.Builder(requireContext(),R.style.Theme_FruitWatch_Dialog)
                 .setTitle("Clear Entire History")
                 .setMessage("Are you sure you want to clear your entire search history?\nThis cannot be undone")
                 .setPositiveButton("Yes, Continue", DialogInterface.OnClickListener { dialog: DialogInterface, i: Int ->
                     if(PastSearchDb(requireContext()).deleteAllPastSearches()){
                         searchList.clear()
                         adapter.notifyDataSetChanged()
-                        Toast.makeText(requireContext(), "Search History Deleted", Toast.LENGTH_LONG).show()
+                        CookieBar.build(activity)
+                            .setTitle("All Search History Deleted!")
+                            .setBackgroundColor(R.color.red_500)
+                            .setIcon(R.drawable.ic_baseline_check_24)
+                            .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                            .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                            .setDuration(3000) 
+                            .show()
+                        toggleEmptySearchListImage()
                     }
                 }
                 ).setNegativeButton("No", null).create()
@@ -134,6 +148,22 @@ class SearchFragment : Fragment() {
             (activity as FragmentDataLink).openCamera()
         }
         return root
+    }
+
+    // Toggle the 'Empty List image'
+    private fun toggleEmptySearchListImage(){
+        if(pastSearchList.adapter != null && pastSearchList.adapter!!.itemCount == 0){
+            pastSearchList.visibility = View.INVISIBLE
+            emptySearchListImg.visibility = View.VISIBLE
+        }else{
+            pastSearchList.visibility = View.VISIBLE
+            emptySearchListImg.visibility = View.INVISIBLE
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        toggleEmptySearchListImage()
     }
 
     override fun onDestroyView() {

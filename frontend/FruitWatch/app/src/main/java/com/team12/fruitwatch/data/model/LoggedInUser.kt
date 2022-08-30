@@ -1,6 +1,5 @@
 package com.team12.fruitwatch.data.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 

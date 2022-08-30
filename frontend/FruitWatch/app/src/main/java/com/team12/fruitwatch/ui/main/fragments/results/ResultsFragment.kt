@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
@@ -38,7 +39,6 @@ class ResultsFragment : Fragment() {
 
     private val TAG = "ResultsFragment"
     private var _binding: FragmentResultsBinding? = null
-
     private var pastSearch: PastSearch? = null
     private lateinit var pricesTblLay: TableLayout
     lateinit var itemImgIV: ImageView
@@ -50,7 +50,6 @@ class ResultsFragment : Fragment() {
     private var nutritionDialog: NutritionDialog? = null
     lateinit var viewPastSearchesBtn: Button
 
-
     companion object{
         val REQUEST_IMAGE_CAPTURE = 2242
     }
@@ -58,7 +57,6 @@ class ResultsFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    val uiScope = CoroutineScope(Dispatchers.Main)
 
     class PriceData {
         var storeName: String = String()
@@ -75,21 +73,16 @@ class ResultsFragment : Fragment() {
     ): View {
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         val startSearchBtn = root.findViewById<Button>(R.id.frag_res_take_pic_btn)
         startSearchBtn.setOnClickListener { dispatchTakePictureIntent() }
         itemImgIV = root.findViewById(R.id.frag_res_item_img)
-        //resultLayout = root.findViewById(R.id.frag_res_search_result_linlay)
         noResultsTV = root.findViewById(R.id.frag_res_no_results_tv)
         predFruitNameTV = root.findViewById(R.id.frag_res_pred_fruit_name)
-
         pricesTblLay = root.findViewById(R.id.frag_res_item_prices_tbl)
         viewPastSearchesBtn = root.findViewById(R.id.frag_res_view_past_searches_btn)
         viewPastSearchesBtn.setOnClickListener {(requireActivity() as FragmentDataLink).openSearchFrag()}
         viewNutritionBtn = root.findViewById(R.id.frag_res_view_nutrition_btn)
         viewNutritionBtn.setOnClickListener { nutritionDialog?.show() }
-
-
         return root
     }
 
@@ -114,7 +107,7 @@ class ResultsFragment : Fragment() {
             }
         }
         val results = RecentResults.mostRecentSearchResults
-        Log.d(TAG,"Loading Search Results: ${results.toString()}")
+        //Log.d(TAG,"Loading Search Results: ${results.toString()}")
         showSearchResults(results)
     }
 
@@ -124,6 +117,7 @@ class ResultsFragment : Fragment() {
         _binding = null
     }
 
+    // Starts the activity to take a picture
     private fun dispatchTakePictureIntent() {
         val takePictureIntent = Intent(activity, CameraActivity::class.java)
         try {
@@ -141,6 +135,7 @@ class ResultsFragment : Fragment() {
         return File(directory, "image.png")
     }
 
+    // Takes the search results and displays them on th UI
     private fun showSearchResults(result: NetworkRequestController.SearchResults?){
         if(result != null) {
             val fruitName = result.name
@@ -157,26 +152,21 @@ class ResultsFragment : Fragment() {
                 }
             }
             if (result.calories != "") {
-                //viewNutritionBtn.visibility = View.VISIBLE
                 if (pastSearch != null) {
                     nutritionDialog = NutritionDialog(requireContext(),isInDarkMode(), pastSearch!!.itemImage!!, result)
                 } else {
                     nutritionDialog = NutritionDialog(requireContext(),isInDarkMode(),itemImgByteArray!!, result)
                 }
-
             }
-//        else {
-//            viewNutritionBtn.visibility = View.GONE
-//        }
         }else{
             viewNutritionBtn.visibility = View.INVISIBLE
             noResultsTV.visibility = View.VISIBLE
             noResultsTV.gravity = Gravity.CENTER
             noResultsTV.text = "No results to show, start a 'New Search' to view the results"
         }
-
     }
 
+    // Converts stores prices from search results to Price Data objects
     private fun processPrices(resultPrices: List<NetworkRequestController.StorePrice>): Array<PriceData?> {
         val data: Array<PriceData?> = arrayOfNulls(resultPrices.size)
         var count = 0
@@ -190,22 +180,19 @@ class ResultsFragment : Fragment() {
                 data[count] = row
                 count += 1
             }
-
         }catch (ne : NumberFormatException){
             Log.e(TAG,"Number Format Error With Result Prices: $resultPrices")
         }catch (npe : NullPointerException){
-        Log.e(TAG,"Null Pointer Error With Result Prices: $resultPrices")
-    }
+            Log.e(TAG,"Null Pointer Error With Result Prices: $resultPrices")
+        }
         return data
     }
 
+    // Converts the search results to data rows for the result table
     private fun loadPricesData(resultPrices: List<NetworkRequestController.StorePrice>?) {
         val horizontalRowMargin = resources.getDimension(R.dimen.margin_sm).toInt()
         val verticalRowPadding = resources.getDimension(R.dimen.padding_sm).toInt()
         val horizontalRowPadding = resources.getDimension(R.dimen.padding_lg).toInt()
-        val horizontalEndStorePadding = resources.getDimension(R.dimen.padding_2xl).toInt()
-
-        val storeTextSize = resources.getDimension(R.dimen.font_size_xl).toInt()
         val priceTextSize = resources.getDimension(R.dimen.font_size_lg).toInt()
 
         val data: Array<PriceData?> = processPrices(resultPrices!!)
@@ -281,11 +268,13 @@ class ResultsFragment : Fragment() {
             tableBtnCellLayoutParams.gravity = Gravity.END + Gravity.CENTER_VERTICAL
 
             val nearbyBtn = Button(context)
+            nearbyBtn.setCompoundDrawablesWithIntrinsicBounds(null, ResourcesCompat.getDrawable(resources,R.drawable.ic_baseline_map_24,null),null,null)
             nearbyBtn.text = "Find\nNearby"
             nearbyBtn.gravity = Gravity.CENTER
             nearbyBtn.setTextColor(resources.getColor(R.color.lighttextcolor,null))
             nearbyBtn.layoutParams = tableBtnCellLayoutParams
-            nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat())
+            nearbyBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, priceTextSize.toFloat()*0.75f)
+
             nearbyBtn.setOnClickListener {
                 val gmmIntentUri: Uri = Uri.parse("geo:0,0?q=${row.storeName}")
                 // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
@@ -332,6 +321,7 @@ class ResultsFragment : Fragment() {
         }
     }
 
+    // Checks if the device currently has 'Dark Mode' enabled
     fun isInDarkMode(): Boolean {
         return requireActivity().resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES

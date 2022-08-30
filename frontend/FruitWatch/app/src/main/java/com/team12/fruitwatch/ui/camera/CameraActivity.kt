@@ -1,6 +1,5 @@
 package com.team12.fruitwatch.ui.camera
 
-
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,13 +10,15 @@ import android.graphics.Rect
 import android.hardware.Camera
 import android.hardware.Camera.PictureCallback
 import android.os.Build
-import androidx.exifinterface.media.ExifInterface
 import android.os.Bundle
 import android.util.Log
+import android.view.Display
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.exifinterface.media.ExifInterface
 import com.team12.fruitwatch.R
 import java.io.File
 import java.io.FileNotFoundException
@@ -34,17 +35,20 @@ class CameraActivity : Activity() {
     private var preview: CameraPreview? = null
     private var cropWidth: Int? = null
     private var cropHeight: Int? = null
-    private var cropPoints: FloatArray? = null
     private var reductionFactor: Double? = null
 
-    /** Create a File for saving an image or video */
+    // Creates the file to hold a users captures item
     private fun getOutputImageFile(): File {
-        // path to /data/data/yourapp/app_data/imageDir
-        val directory: File = applicationContext.getDir("search_images", Context.MODE_PRIVATE)
-        // Create imageDir
-        return File(directory, "image.png")
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+            val directory: File = applicationContext.getDir("app_search_images", Context.MODE_PRIVATE)
+            return File(directory, "lime.jpg")
+        }else{
+            val directory: File = applicationContext.getDir("search_images", Context.MODE_PRIVATE)
+            return File(directory, "image.png")
+        }
     }
 
+    // This method handles the result of a picture being taken
     private val mPicture = PictureCallback { data, camera ->
         val pictureFile: File = getOutputImageFile()
         try {
@@ -63,12 +67,11 @@ class CameraActivity : Activity() {
         }
     }
 
-
     companion object {
         val RESULT_FAILED = -200
     }
 
-    /** Called when the activity is first created.  */
+    // Called when the activity is first created.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!checkCameraHardware(applicationContext)) {
@@ -82,24 +85,32 @@ class CameraActivity : Activity() {
         capture!!.setOnClickListener {
             captureImage()
         }
+
         camera = getCameraInstance()
+        if(camera == null){
+            setResult(RESULT_FAILED)
+            finish()
+            return
+        }
+
         var parameters = camera!!.parameters
         if (parameters.supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
             parameters.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
-
         } else {
             Log.i(TAG, "Continuous Focus Mode is not supported!")
         }
 
+        //Looks for a common camera resolution size so the picture captured will be a balance of good quality and small size
         var foundOptSize = false
         for(size in  parameters.supportedPictureSizes){
             if(size.width == 1280 && size.height == 720){
-                Log.i(TAG,"Setting Picture Size to preferred size of: ${size.width}X${size.height}")
+                //Log.i(TAG,"Setting Picture Size to preferred size of: ${size.width}X${size.height}")
                 parameters.setPictureSize(size.width,size.height)
                 if(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         display!!.rotation == 2 || display!!.rotation == 0
                     } else {
-                        requestedOrientation == 2 || requestedOrientation == 0
+                        val display: Display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+                        display.rotation == 2 || display.rotation == 0
                     }) {
                     reductionFactor =
                         size.width.toDouble() / resources.displayMetrics.heightPixels.toDouble()
@@ -112,24 +123,24 @@ class CameraActivity : Activity() {
         }
         if(!foundOptSize){
             val sortedPicturesSizes = parameters.supportedPictureSizes.sortedBy { it.width*it.height}
-            Log.i(TAG,"Setting Picture Size to: ${sortedPicturesSizes.last().width}X${sortedPicturesSizes.last().height}")
+            //Log.i(TAG,"Setting Picture Size to: ${sortedPicturesSizes.last().width}X${sortedPicturesSizes.last().height}")
             parameters.setPictureSize(sortedPicturesSizes.last().width,sortedPicturesSizes.last().height)
             if(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     display!!.rotation == 2 || display!!.rotation == 0
                 } else {
-                    requestedOrientation == 2 || requestedOrientation == 0
+                    val display: Display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+                    display.rotation == 2 || display.rotation == 0
                 }
             ) {
                 reductionFactor = sortedPicturesSizes.last().width.toDouble()/resources.displayMetrics.heightPixels.toDouble()
             }else{
                 reductionFactor = sortedPicturesSizes.last().width.toDouble()/resources.displayMetrics.widthPixels.toDouble()
             }
-
         }
         camera!!.parameters = parameters
         parameters.supportedPictureSizes
 
-        Log.i(TAG,"ReductionFactor is: $reductionFactor")
+        //Log.i(TAG,"ReductionFactor is: $reductionFactor")
 
         preview = camera?.let {
             // Create our Preview view
@@ -143,7 +154,6 @@ class CameraActivity : Activity() {
         }
     }
 
-
     // Fixes the Image rotation and crops the image to the boundaries of the guide box
     private fun postProcessImage(imageByteArray: ByteArray, targetFile: File): Boolean {
         val fos = FileOutputStream(targetFile)
@@ -155,8 +165,7 @@ class CameraActivity : Activity() {
             ExifInterface.ORIENTATION_UNDEFINED
         )
         var bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size)
-
-        Log.d(TAG, "Orientation: $orientation")
+        //Log.d(TAG, "Orientation: $orientation")
         var processedBitmap: Bitmap? = null
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> processedBitmap = cropBitmap(bitmap, 90)
@@ -165,7 +174,6 @@ class CameraActivity : Activity() {
             ExifInterface.ORIENTATION_NORMAL -> processedBitmap = cropBitmap(bitmap, 0)
             else -> processedBitmap = cropBitmap(bitmap, 0)
         }
-
         var postProcessedFOS: FileOutputStream? = null
         try {
             postProcessedFOS = FileOutputStream(targetFile)
@@ -179,26 +187,28 @@ class CameraActivity : Activity() {
                 postProcessedFOS?.close()
             } catch (e: IOException) {
                 e.printStackTrace()
-
             }
         }
         return true
     }
 
+    // Get the X-axis Coordinates of the image within the image guide box shown on screen
     private fun findImageXOrigin(imageWidth: Int): Int {
         return (imageWidth / 2) - (cropWidth!! / 2)
     }
 
+    // Get the Y-axis Coordinates of the image within the image guide box shown on screen
     private fun findImageYOrigin(imageHeight: Int): Int {
         return (imageHeight / 2) - (cropHeight!! / 2)
     }
 
+    // Get the points/edges of the image guide box shown on screen
     private fun getCropPoints():FloatArray {
         val itemGuide = findViewById<View>(R.id.cameraprev_itemGuide) as ImageView
         cropWidth = (itemGuide.width* reductionFactor!!).toInt()
         cropHeight = (itemGuide.height* reductionFactor!!).toInt()
-        Log.i(TAG,"Crop Width is: $cropWidth")
-        Log.i(TAG,"Crop Height is: $cropHeight")
+        //Log.i(TAG,"Crop Width is: $cropWidth")
+        //Log.i(TAG,"Crop Height is: $cropHeight")
         return floatArrayOf(
             itemGuide.left.toFloat(),
             itemGuide.top.toFloat(),
@@ -211,6 +221,7 @@ class CameraActivity : Activity() {
         )
     }
 
+    // Crop the captured image to the edges of the item guide box
     private fun cropBitmap(
         bitmap: Bitmap,
         degreesRotated: Int
@@ -218,49 +229,12 @@ class CameraActivity : Activity() {
         var result: Bitmap? = null
         // get the points of the crop rectangle adjusted to source bitmap
         val points = getCropPoints()
-        val loadedSampleSize = 2
-//        val orgWidth: Int = bitmap.width * loadedSampleSize;
-//        val orgHeight: Int = bitmap.height * loadedSampleSize;
-
-        // get the rectangle for the points (it may be larger than original if rotation is not stright)
-//        val rect = getRectFromPoints(
-//            points,
-//            orgWidth,
-//            orgHeight,
-//            false,
-//            1,
-//            1
-//        );
-
-//        val sampleSize: Int
         try {
-//            val options = BitmapFactory.Options()
-//            sampleSize = (1
-//                    * calculateInSampleSizeByRequestedSize(
-//                rect.width(),
-//                rect.height(),
-//                orgWidth,
-//                orgHeight
-//            ))
-            //options.inSampleSize = sampleSize
-
             try {
-                // adjust crop points by the sampling because the image is smaller
-//                val points2 = FloatArray(points.size)
-//                System.arraycopy(points, 0, points2, 0, points.size)
-//                for (i in points2.indices) {
-//                    points2[i] = points2[i] / sampleSize
-//                }
                 result = cropBitmapObjectWithScale(
                     bitmap,
                     degreesRotated,
-                    points,
-                    true,
-                    1,
-                    1,
-                    1f,
-                    false,
-                    false
+                    points
                 )
             } finally {
                 if (result != bitmap) {
@@ -281,16 +255,11 @@ class CameraActivity : Activity() {
         return result!!
     }
 
+    // Crop the captured image to the edges of the item guide box with image scaling
     private fun cropBitmapObjectWithScale(
         bitmap: Bitmap,
         degreesRotated: Int,
-        points:FloatArray,
-        fixAspectRatio: Boolean,
-        aspectRatioX: Int,
-        aspectRatioY: Int,
-        scale: Float,
-        flipHorizontally: Boolean,
-        flipVertically: Boolean
+        points:FloatArray
     ): Bitmap {
 
         // get the rectangle in original image that contains the required cropped area (larger for non
@@ -298,10 +267,7 @@ class CameraActivity : Activity() {
         val rect: Rect = getRectFromPoints(
             points,
             bitmap.width,
-            bitmap.height,
-            fixAspectRatio,
-            aspectRatioX,
-            aspectRatioY
+            bitmap.height
         )
 
         // crop and rotate the cropped image in one operation
@@ -312,10 +278,9 @@ class CameraActivity : Activity() {
             (bitmap.height / 2).toFloat()
         )
         matrix.postScale(
-            if (flipHorizontally) -scale else scale,
-            if (flipVertically) -scale else scale
+            1f,
+            1f
         )
-        val itemGuide = findViewById<View>(R.id.cameraprev_itemGuide) as ImageView
         var result = Bitmap.createBitmap(
             bitmap,
             findImageXOrigin(bitmap.width),
@@ -332,26 +297,21 @@ class CameraActivity : Activity() {
 
         // rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping
         if (degreesRotated % 90 != 0) {
-
             // extra crop because non rectangular crop cannot be done directly on the image without
             // rotating first
-            result = cropForRotatedImage(
-                result, points, rect, degreesRotated, fixAspectRatio, aspectRatioX, aspectRatioY
-            )
+            result = cropForRotatedImage(result, points, rect, degreesRotated)
         }
         return result
     }
 
+    // Crop the captured image to the edges of the item guide box even if the device is rotated
     private fun cropForRotatedImage(
         bitmap: Bitmap,
         points: FloatArray,
         rect: Rect,
-        degreesRotated: Int,
-        fixAspectRatio: Boolean,
-        aspectRatioX: Int,
-        aspectRatioY: Int
-    ): Bitmap? {
-        var bitmap = bitmap
+        degreesRotated: Int
+    ): Bitmap {
+        var bm = bitmap
         if (degreesRotated % 90 != 0) {
             var adjLeft = 0
             var adjTop = 0
@@ -372,50 +332,28 @@ class CameraActivity : Activity() {
                 i += 2
             }
             rect[adjLeft, adjTop, adjLeft + width] = adjTop + height
-            if (fixAspectRatio) {
-                fixRectForAspectRatio(rect, aspectRatioX, aspectRatioY)
-            }
-            val bitmapTmp = bitmap
-            bitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
-            if (bitmapTmp != bitmap) {
+            fixRectForAspectRatio(rect)
+            val bitmapTmp = bm
+            bm = Bitmap.createBitmap(bm, rect.left, rect.top, rect.width(), rect.height())
+            if (bitmapTmp != bm) {
                 bitmapTmp.recycle()
             }
         }
-        return bitmap
+        return bm
     }
 
-    private fun calculateInSampleSizeByRequestedSize(
-        width: Int, height: Int, reqWidth: Int, reqHeight: Int
-    ): Int {
-        var inSampleSize = 1
-        if (height > reqHeight || width > reqWidth) {
-            while (height / 2 / inSampleSize > reqHeight && width / 2 / inSampleSize > reqWidth) {
-                inSampleSize *= 2
-            }
-        }
-        return inSampleSize
-    }
-
-    // 0,1,2,3,4,5,6,7
-    // L,T,R,T,R,B,L,B
+    // Create a Rectangle object from the item guide box shown on the UI
     private fun getRectFromPoints(
         points: FloatArray,
         imageWidth: Int,
-        imageHeight: Int,
-        fixAspectRatio: Boolean,
-        aspectRatioX: Int,
-        aspectRatioY: Int
+        imageHeight: Int
     ): Rect {
-        var left = 0f.coerceAtLeast(getRectLeft(points)).toDouble().roundToInt()
-        var top = 0f.coerceAtLeast(getRectTop(points)).toDouble().roundToInt()
-        var right = imageWidth.toFloat().coerceAtLeast(getRectRight(points)).toDouble().roundToInt()
-        var bottom = imageHeight.toFloat().coerceAtMost(getRectBottom(points)).toDouble().roundToInt()
-
+        val left = 0f.coerceAtLeast(getRectLeft(points)).toDouble().roundToInt()
+        val top = 0f.coerceAtLeast(getRectTop(points)).toDouble().roundToInt()
+        val right = imageWidth.toFloat().coerceAtLeast(getRectRight(points)).toDouble().roundToInt()
+        val bottom = imageHeight.toFloat().coerceAtMost(getRectBottom(points)).toDouble().roundToInt()
         val rect = Rect(left, top, right, bottom)
-        //val rect = Rect(points[0].toInt(), points[1].toInt(), points[2].toInt(), points[5].toInt())
-        if (fixAspectRatio) {
-            fixRectForAspectRatio(rect, aspectRatioX, aspectRatioY)
-        }
+        fixRectForAspectRatio(rect)
         return rect
     }
 
@@ -459,8 +397,9 @@ class CameraActivity : Activity() {
         )
     }
 
-    private fun fixRectForAspectRatio(rect: Rect, aspectRatioX: Int, aspectRatioY: Int) {
-        if (aspectRatioX == aspectRatioY && rect.width() != rect.height()) {
+    //
+    private fun fixRectForAspectRatio(rect: Rect) {
+        if (rect.width() != rect.height()) {
             if (rect.height() > rect.width()) {
                 rect.bottom -= rect.height() - rect.width()
             } else {
@@ -469,12 +408,14 @@ class CameraActivity : Activity() {
         }
     }
 
+    // Start taking the picture
     private fun captureImage() {
         if (cropWidth == null) {
             getCropPoints()
         }
         camera!!.takePicture(null, null, mPicture)
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -487,12 +428,14 @@ class CameraActivity : Activity() {
     }
 
 
+    // Clear the camera related variables
     private fun releaseCamera() {
         camera?.release() // release the camera for other applications
         camera = null
     }
 
 
+    // Finish the Camera Activity
     private fun stopCamera() {
         setResult(RESULT_CANCELED)
         finish()
@@ -503,11 +446,14 @@ class CameraActivity : Activity() {
         return try {
             Camera.open() // attempt to get a Camera instance
         } catch (e: Exception) {
+            setResult(RESULT_FAILED)
+            finish()
             // Camera is not available (in use or does not exist)
             null // returns null if camera is unavailable
         }
     }
 
+    // Check if the device has a camera
     private fun checkCameraHardware(context: Context): Boolean {
         return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
     }

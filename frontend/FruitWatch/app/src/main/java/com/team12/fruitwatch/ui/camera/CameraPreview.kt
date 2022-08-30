@@ -1,13 +1,13 @@
 package com.team12.fruitwatch.ui.camera
 
 
+import android.app.Activity
 import android.content.Context
 import android.hardware.Camera
 import android.hardware.Camera.CameraInfo
+import android.os.Build
 import android.util.Log
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.SurfaceView
+import android.view.*
 import java.io.IOException
 
 /** A basic Camera preview class */
@@ -72,10 +72,16 @@ class CameraPreview(
             }
         }
 
+
     private fun setCameraDisplayOrientation() {
         val info = CameraInfo()
         Camera.getCameraInfo(0, info)
-        val rotation = context.display!!.rotation
+        val rotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.display!!.rotation
+            } else {
+                val display: Display = (context.getSystemService(Activity.WINDOW_SERVICE) as WindowManager).defaultDisplay
+                display.rotation
+            }
         var degrees = 0
         when (rotation) {
             Surface.ROTATION_0 -> degrees = 0
@@ -84,8 +90,8 @@ class CameraPreview(
             Surface.ROTATION_270 -> degrees = 270
         }
         var result: Int = (info.orientation - degrees + 360) % 360
-        Log.d(TAG,"Rotation: $rotation")
-        Log.d(TAG,"Display Orientation: $result")
+        //Log.d(TAG,"Rotation: $rotation")
+        //Log.d(TAG,"Display Orientation: $result")
         val parameters = camera.parameters
         parameters.setRotation(result)
         camera.parameters = parameters

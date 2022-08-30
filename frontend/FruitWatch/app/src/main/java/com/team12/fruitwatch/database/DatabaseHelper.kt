@@ -9,6 +9,7 @@ import android.util.Log
 import com.team12.fruitwatch.database.entitymanager.*
 import java.io.File
 
+// This class is responsible the creation/update process of the database, as well as providing the Database object
 class DatabaseHelper (context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     private val TABLES = arrayOf<String>(PastSearchDb.tableName)
@@ -21,10 +22,10 @@ class DatabaseHelper (context: Context?) : SQLiteOpenHelper(context, DATABASE_NA
 
 
     override fun onCreate(db: SQLiteDatabase) {
-        Log.d(TAG, "Running onCreate Method")
+        //Log.d(TAG, "Running onCreate Method")
         try {
             db.execSQL(CREATE_COURSES_TABLE)
-            Log.d(TAG, "PastSearch Table Created")
+            //Log.d(TAG, "PastSearch Table Created")
             Log.d(TAG, "Local Database Build Successful.")
         } catch (scoe: SQLiteCantOpenDatabaseException) {
             Log.d(TAG, "Local Database Couldn't be Opened or Created.")

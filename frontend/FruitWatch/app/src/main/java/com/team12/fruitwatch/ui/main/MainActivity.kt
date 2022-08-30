@@ -9,13 +9,14 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -27,7 +28,6 @@ import com.google.android.material.navigation.NavigationView
 import com.team12.fruitwatch.R
 import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.data.AuthenticationDataSource
-import com.team12.fruitwatch.data.AuthenticationRepository
 import com.team12.fruitwatch.data.model.LoggedInUser
 import com.team12.fruitwatch.database.entities.PastSearch
 import com.team12.fruitwatch.database.entitymanager.PastSearchDb
@@ -42,8 +42,8 @@ import com.team12.fruitwatch.ui.main.fragments.results.RecentResults
 import com.team12.fruitwatch.ui.main.fragments.results.ResultsFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.aviran.cookiebar2.CookieBar
 import java.io.File
 import java.time.LocalDateTime
 
@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     companion object {
         const val IN_DEVELOPMENT = false
+        var showLoginGreeting = true
         lateinit var userInfo: LoggedInUser
         val PAST_RES_KEY = "PAST_RESULTS"
         val SEARCH_RES_KEY = "SEARCH_RESULTS"
@@ -66,6 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navView: NavigationView
     private lateinit var loadingAnimation: LoadingAnimation
+    private lateinit var mainViewModel: MainViewModel
 
     // Initialise all the elements of the main activity
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,14 +75,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (!intent.hasExtra("USER_KEY")) {
             throw Exception()
         }
-        checkCameraPermissions(this)
+
+        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        if(checkCameraHardware(this)) {
+            checkCameraPermissions(this)
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
         val drawerLayout: DrawerLayout = binding.drawerLayout
-
         navView = binding.navView
-
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController: NavController = navHostFragment.navController
 
@@ -100,6 +104,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userDisplayName.text = getString(R.string.welcome, userInfo.displayName)
         loadingAnimation = LoadingAnimation(this, "loading.json")
         insertValidJWT()
+
+
     }
 
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -124,7 +130,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             super.onBackPressed()
             finish()
         } else {
-            Toast.makeText(baseContext, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            CookieBar.build(this@MainActivity)
+                .setTitle("Press back again to exit")
+                .setBackgroundColor(R.color.orange_500)
+                .setIcon(R.drawable.ic_baseline_priority_high_24)
+                .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                .setDuration(3000)
+                .show()
         }
         pressedTime = System.currentTimeMillis()
     }
@@ -157,7 +170,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 if (RecentResults.mostRecentSearchResults != null) {
                     navController.navigate(R.id.nav_results)
                 } else {
-                    val noRecentSearch = AlertDialog.Builder(this)
+                    val noRecentSearch = AlertDialog.Builder(this,R.style.Theme_FruitWatch_Dialog)
                         .setTitle("Nothing to show")
                         .setMessage("You need to conduct a search before looking at the results, do you want to start a search now?")
                         .setPositiveButton("Yes, Search", DialogInterface.OnClickListener { dialog: DialogInterface, i: Int ->
@@ -172,21 +185,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 navController.navigate(R.id.nav_settings)
             }
             R.id.nav_logout -> {
-                CoroutineScope(Dispatchers.Main).launch {
-                    val loginRepo = LoginViewModel(AuthenticationRepository(AuthenticationDataSource()))
+                CoroutineScope(Dispatchers.IO).launch {
+                    val loginRepo = LoginViewModel(AuthenticationDataSource())
                     if (loginRepo.logout(userInfo.jwt)) {
                         clearJWT()
                         CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(applicationContext, R.string.logout_success, Toast.LENGTH_LONG).show()
                             startActivity(Intent(applicationContext, LoginActivity::class.java))
                             finish()
                         }
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(applicationContext, R.string.logout_failed, Toast.LENGTH_LONG).show()
+                            CookieBar.build(this@MainActivity)
+                                .setTitle(R.string.logout_failed)
+                                .setBackgroundColor(R.color.red_500)
+                                .setIcon(R.drawable.ic_baseline_clear_24)
+                                .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                                .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                                .setDuration(4000)
+                                .show()
                         }
                     }
                 }
+            }
+            R.id.nav_credit -> {
+                    val creditDialog = AlertDialog.Builder(this,R.style.Theme_FruitWatch_Dialog)
+                        .setTitle("Fruit Watch Creators")
+                        .setMessage("The creators/authors and their sections of contribution towards the Fruit Watch project are:" +
+                                "\n\nCameron Akers \n\t\t\t- Frontend\n\n" +
+                                "Marck Munoz\n\t\t\t- Backend\n" +
+                                "\t\t\t- Server Management\n" +
+                                "\t\t\t- Machine Learning\n\n" +
+                                "Matthew Fuaux\n\t\t\t- Backend\n" +
+                                "\t\t\t- Scraper")
+                        .setNeutralButton("Close", null).create()
+                creditDialog.show()
             }
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -205,6 +237,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onStart() {
         super.onStart()
         toggleResultsMenuItemVisibility()
+        if(showLoginGreeting) {
+            val welcomeText = getString(R.string.welcome, userInfo.displayName)
+            CookieBar.build(this)
+                .setTitle(welcomeText)
+                .setBackgroundColor(R.color.blue_500)
+                .setIcon(R.drawable.ic_baseline_back_hand_24)
+                .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                .setDuration(4000) 
+                .show()
+            showLoginGreeting = false
+        }
     }
 
     // Clear the recent results when activity is destroyed
@@ -266,16 +310,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startImageSearch(imageFile)
         } else if (resultCode == CameraActivity.RESULT_FAILED) {
             Log.d("HomeFragment", "No camera attached on device")
-            Toast.makeText(this, "No camera detected on device!", Toast.LENGTH_LONG).show()
+            CookieBar.build(this@MainActivity)
+                .setTitle("No camera detected on device!")
+                .setBackgroundColor(R.color.red_500)
+                .setIcon(R.drawable.ic_baseline_clear_24)
+                .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                .setDuration(4000) 
+                .show()
         }
     }
 
     // Starts a search using the name of a previously searched item
     override fun startTextSearch(pastSearch: PastSearch) {
-        GlobalScope.launch(Dispatchers.IO) {
+        mainViewModel.viewModelScope.launch(Dispatchers.IO) {
             RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithItemName(userInfo, pastSearch.itemName!!)
             RecentResults.mostRecentPastSearch = pastSearch
-            GlobalScope.launch(Dispatchers.Main) {
+            mainViewModel.viewModelScope.launch(Dispatchers.Main) {
                 onFinishedLoading()
                 toggleResultsMenuItemVisibility()
                 val navController = navHostFragment.findNavController()
@@ -286,7 +337,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // Start a new search with a recently taken image
     override fun startImageSearch(imageFile: File) {
-        GlobalScope.launch(Dispatchers.IO) {
+
+        mainViewModel.viewModelScope.launch(Dispatchers.IO) {
             RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithImage(userInfo, imageFile)
             if (RecentResults.mostRecentSearchResults!!.name != "Unknown") {
                 val pastSearchDb = PastSearchDb(applicationContext)
@@ -294,16 +346,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     RecentResults.mostRecentPastSearch = PastSearch(-1L, RecentResults.mostRecentSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
                     RecentResults.mostRecentPastSearch!!.id = PastSearchDb(applicationContext).createPastSearchEntry(RecentResults.mostRecentPastSearch!!)
                     if (RecentResults.mostRecentPastSearch!!.id != -1L) {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            Toast.makeText(applicationContext, "Search History Updated!", Toast.LENGTH_SHORT).show()
+                        if(pastSearchDb.determineIfPastSearchLimitIsReached()){
+                            mainViewModel.viewModelScope.launch(Dispatchers.Main) {
+                                CookieBar.build(this@MainActivity)
+                                    .setTitle("Search History Updated!")
+                                    .setBackgroundColor(R.color.green_500)
+                                    .setIcon(R.drawable.ic_baseline_check_24)
+                                    .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                                    .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                                    .setDuration(3000) 
+                                    .show()
+                            }
+                            Log.d(TAG, "Past Search Result Updated!!")
+                        }else{
+                            mainViewModel.viewModelScope.launch(Dispatchers.Main) {
+                                CookieBar.build(this@MainActivity)
+                                    .setTitle("Search History Appended!")
+                                    .setBackgroundColor(R.color.green_500)
+                                    .setIcon(R.drawable.ic_baseline_check_24)
+                                    .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                                    .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                                    .setDuration(3000) 
+                                    .show()
+                            }
+                            Log.d(TAG, "Past Search Result Added!!")
                         }
-                        Log.d(TAG, "Past Search Result Added!!")
                     }
                 }else{
                     RecentResults.mostRecentPastSearch = pastSearchDb.getPastSearchByItemName(RecentResults.mostRecentSearchResults!!.name)!!
                 }
             }else{
-                val itemUnrecognized = AlertDialog.Builder(applicationContext, androidx.appcompat.R.style.Theme_AppCompat_Dialog)
+                val itemUnrecognized = AlertDialog.Builder(applicationContext,R.style.Theme_FruitWatch_Dialog)
                     .setTitle("Item Unrecognised")
                     .setMessage("The item captured was unrecognised, please re-capture the image to restart the search")
                     .setPositiveButton("Ok, Re-Capture", DialogInterface.OnClickListener { dialog: DialogInterface, i: Int ->
@@ -312,7 +385,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     ).setNegativeButton("No", null).create()
                 itemUnrecognized.show()
             }
-            GlobalScope.launch(Dispatchers.Main) {
+            mainViewModel.viewModelScope.launch(Dispatchers.Main) {
                 onFinishedLoading()
                 toggleResultsMenuItemVisibility()
                 val navController = navHostFragment.findNavController()
@@ -323,12 +396,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // Open the camera to take a picture
     override fun openCamera() {
-        val takePictureIntent = Intent(this, CameraActivity::class.java)
-        try {
-            startActivityForResult(takePictureIntent, ResultsFragment.REQUEST_IMAGE_CAPTURE)
-        } catch (e: ActivityNotFoundException) {
-            // display error state to the user
-            Log.d("HomeFragment", "Activity Not Found $e")
+        if(checkCameraHardware(applicationContext)) {
+            checkCameraPermissions(applicationContext!!)
+            val takePictureIntent = Intent(this, CameraActivity::class.java)
+            try {
+                startActivityForResult(takePictureIntent, ResultsFragment.REQUEST_IMAGE_CAPTURE)
+            } catch (e: ActivityNotFoundException) {
+                // display error state to the user
+                Log.d("HomeFragment", "Activity Not Found $e")
+            }
         }
     }
 
@@ -347,5 +423,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     // Hide the searching animation
     override fun onFinishedLoading() {
         loadingAnimation.stopAnimation()
+    }
+
+    // Check if the device has a camera
+    private fun checkCameraHardware(context: Context): Boolean {
+        return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
     }
 }

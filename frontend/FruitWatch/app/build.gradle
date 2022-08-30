@@ -1,14 +1,8 @@
 plugins {
-    //id 'org.jetbrains.kotlin.android'
-    //id 'kotlin-android-extensions'
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
 }
-
-//apply plugin: 'com.android.application'
-//apply plugin: 'kotlin-android'
-//apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdk 31
@@ -18,7 +12,7 @@ android {
         minSdk 26
         targetSdk 31
         versionCode 1
-        versionName "0.4 alpha"
+        versionName "0.5 beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -60,10 +54,9 @@ ext {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-    //implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.8.0'
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    implementation 'androidx.core:core-ktx:1.8.0'
     implementation "androidx.cardview:cardview:1.0.0"
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
@@ -71,32 +64,36 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.1'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
     implementation 'androidx.exifinterface:exifinterface:1.3.3'
 
-//Lottie Animation
+    // External Libraries
+    implementation 'org.aviran.cookiebar2:cookiebar2:1.1.5'
+
+    //Lottie Animation (Loading Animation)
     implementation "com.airbnb.android:lottie:5.2.0"
 
-        // Fuel.
-        //for JVM
-        implementation "com.github.kittinunf.fuel:fuel:${fuelVersion}"
-        //for Android
-        implementation "com.github.kittinunf.fuel:fuel-android:${fuelVersion}"
-        //for Gson support
-        implementation "com.github.kittinunf.fuel:fuel-gson:${fuelVersion}"
-        //for Coroutines
-        implementation "com.github.kittinunf.fuel:fuel-coroutines:${fuelVersion}"
+    // Fuel.
+    //for JVM
+    implementation "com.github.kittinunf.fuel:fuel:${fuelVersion}"
+    //for Android
+    implementation "com.github.kittinunf.fuel:fuel-android:${fuelVersion}"
+    //for Gson support
+    implementation "com.github.kittinunf.fuel:fuel-gson:${fuelVersion}"
+    //for Coroutines
+    implementation "com.github.kittinunf.fuel:fuel-coroutines:${fuelVersion}"
 
-        // Gson.
-        implementation 'com.google.code.gson:gson:2.9.1'
+    // Gson.
+    implementation 'com.google.code.gson:gson:2.9.1'
+
+    // Testing Libraries
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.mockito:mockito-inline:4.6.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
 }

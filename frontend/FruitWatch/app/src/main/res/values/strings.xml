@@ -11,7 +11,7 @@
     <string name="action_show_registration">Show Registration</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_register_and_sign_in">Register and Sign in</string>
-    <string name="welcome">"Welcome %s!"</string>
+    <string name="welcome">"Hello %s, Welcome!"</string>
     <string name="invalid_firstname">Not a valid firstname</string>
     <string name="invalid_surname">Not a valid surname</string>
     <string name="invalid_email">Not a valid email</string>
@@ -37,6 +37,7 @@
     <string name="menu_results">Search Results</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Log Out</string>
+    <string name="menu_credit">Credit</string>
 
     <!-- Button Titles -->
     <string name="view_nutritional_info">Nutritional\nInfo</string>

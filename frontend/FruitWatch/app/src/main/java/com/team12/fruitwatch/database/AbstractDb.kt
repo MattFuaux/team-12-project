@@ -9,9 +9,7 @@ import android.util.Log
 import java.util.HashMap
 
 /**
- * This class provides basic functionality to use a database table.
- *
- * @author Andreas Bender
+ * This class provides common database functionality to view,insert,update,delete rows from a database table.
  */
 abstract class AbstractDb(context: Context?) {
     protected var databaseHelper: DatabaseHelper

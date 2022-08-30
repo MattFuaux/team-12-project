@@ -1,36 +1,15 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-
-        >
-
-        <EditTextPreference
-            app:key="signature"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory android:title="Past Search List">
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-
-        >
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-
-            />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-
-            />
+            app:defaultValue="20"
+            app:entries="@array/past_search_list_length_items"
+            app:entryValues="@array/past_search_list_length"
+            app:title="Length of Past Search List"
+            app:key="past_search_list_length"
+            app:summary="This will change the length of a users past search list. Once this limit is reached then the oldest search results will be auto-deleted to save space on the users device. (Default length is 20)" />
 
     </PreferenceCategory>
 

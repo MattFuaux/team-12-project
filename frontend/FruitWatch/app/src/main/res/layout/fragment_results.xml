@@ -9,12 +9,14 @@
     <ImageView
         android:layout_width="0dp"
         android:layout_height="200dp"
-        android:layout_margin="@dimen/margin_lg"
+        android:layout_marginStart="@dimen/margin_sm"
+        android:layout_marginEnd="@dimen/margin_sm"
         android:id="@+id/frag_res_item_img"
         android:src="@drawable/no_image_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/frag_res_view_nutrition_btn"
-        app:layout_constraintTop_toBottomOf="@id/frag_res_pred_fruit_name"
+        app:layout_constraintTop_toTopOf="@id/frag_res_take_pic_btn"
+        app:layout_constraintBottom_toBottomOf="@id/frag_res_view_nutrition_btn"
         android:contentDescription="@string/content_desc_scanned_item_image" />
 
 
@@ -113,7 +115,7 @@ android:padding="@dimen/padding_xl"
         android:textColor="@color/lighttextcolor"
         android:textSize="@dimen/font_size_lg"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/frag_res_item_img"
+        app:layout_constraintTop_toBottomOf="@id/frag_res_view_nutrition_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

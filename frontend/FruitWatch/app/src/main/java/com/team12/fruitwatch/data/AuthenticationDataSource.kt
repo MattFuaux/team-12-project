@@ -11,13 +11,10 @@ import java.io.IOException
  */
 class AuthenticationDataSource {
 
+    // Send the user login information to the network controller and returns the appropriate response depending on the network controller result
     suspend fun login(email: String, password: String): Result<LoggedInUser> {
         return withContext(Dispatchers.IO) {
-//            if(MainActivity.IN_DEVELOPMENT){
-//                return@withContext Result.Success(LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe","jwt") as LoggedInUser)
-//            }
             try {
-                // TODO: handle loggedInUser authentication
                 val networkRequestController = NetworkRequestController()
                 val response = networkRequestController.loginUser(email, password)
                 if (response.statusCode == 200) {
@@ -31,6 +28,7 @@ class AuthenticationDataSource {
         }
     }
 
+    // Send the user registration information to the network controller then immediately logs the user in then returns the appropriate response depending on the network controller result
     suspend fun register(firstname: String, surname: String, email: String, password: String): Result<LoggedInUser> {
         return withContext(Dispatchers.IO) {
             try {
@@ -50,12 +48,14 @@ class AuthenticationDataSource {
         }
     }
 
+    // Send the user logout information to the network controller and returns the appropriate response depending on the network controller result
     suspend fun logout(jwt: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val networkRequestController = NetworkRequestController()
                 val response = networkRequestController.logoutUser(jwt)
-                if (response.statusCode == 200) {
+                // if the response data is null then the server received and invalidated the JWT so the user will be logged out
+                if (response.statusCode == 200 && response.data == null) {
                     return@withContext true
                 }
                 throw Exception("Error Logging User Out")
@@ -65,6 +65,7 @@ class AuthenticationDataSource {
         }
     }
 
+    // Send the users JWT information to the network controller to check if the JWT has expired and then returns the appropriate response depending on the network controller result
     suspend fun checkIfValid(jwt: String): Result<LoggedInUser> {
         return withContext(Dispatchers.IO) {
             try {

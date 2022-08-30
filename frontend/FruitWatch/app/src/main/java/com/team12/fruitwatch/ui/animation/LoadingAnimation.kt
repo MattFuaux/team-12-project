@@ -7,7 +7,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.team12.fruitwatch.R
 
 
-
+// This class managers the View that the loading animation requires, by providing simple start and stop methods for the animation
 class LoadingAnimation(private val context: Activity, animationName: String) {
 
     private var lottieAnimationView : LottieAnimationView =   context.findViewById<LottieAnimationView>(R.id.load_snip_loading_anim) as LottieAnimationView

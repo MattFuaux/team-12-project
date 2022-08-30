@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.team12.fruitwatch.R
-import com.team12.fruitwatch.data.AuthenticationRepository
+import com.team12.fruitwatch.data.AuthenticationDataSource
 import com.team12.fruitwatch.data.Result
 
-class LoginViewModel(private val loginRepository: AuthenticationRepository) : ViewModel() {
+// This view model keeps the pieces of data shown on the Login Activity in sync with the changes that they incur in the background from extrenal sources (server)
+class LoginViewModel(private val authenticationDataSource: AuthenticationDataSource) : ViewModel() {
 
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
@@ -15,9 +16,10 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
+    // Sends the login information to the Authentication Data Source, then returns the result to the UI (Login Activity)
     suspend fun login(email: String, password: String) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.login(email, password)
+        val result = authenticationDataSource.login(email, password)
 
         if (result is Result.Success) {
             _loginResult.value = LoginResult(success = LoggedInUserView(result.data.userId,result.data.displayName,result.data.jwt))
@@ -26,9 +28,10 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         }
     }
 
+    // Sends the login information to the Authentication Data Source, then returns the result to the UI (Login Activity)
     suspend fun register(firstname:String, surname:String, email: String, password: String) {
         // can be launched in a separate asynchronous job
-        val registrationResult = loginRepository.register(firstname, surname, email, password)
+        val registrationResult = authenticationDataSource.register(firstname, surname, email, password)
 
         if (registrationResult is Result.Success) {
             _loginResult.value = LoginResult(success = LoggedInUserView(registrationResult.data.userId,registrationResult.data.displayName,registrationResult.data.jwt))
@@ -37,13 +40,15 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         }
     }
 
+    // Sends the logout/JWT information to the Authentication Data Source, then returns the result to the UI (Login Activity)
     suspend fun logout(jwt:String) : Boolean {
-        return loginRepository.logout(jwt)
+        return authenticationDataSource.logout(jwt)
     }
 
+    // Sends the users JWT information to the Authentication Data Source, then returns the result to the UI (Login Activity)
     suspend fun isEntryValid(jwt: String)  {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.checkIfValid(jwt)
+        val result = authenticationDataSource.checkIfValid(jwt)
         if (result is Result.Success) {
             _loginResult.value = LoginResult(success = LoggedInUserView(result.data.userId,result.data.displayName,result.data.jwt))
         } else {
@@ -51,6 +56,7 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         }
     }
 
+    // Updates the login information that has been entered on the UI (Login Activity) in order to validate the input
     fun loginDataChanged(email: String, password: String) {
         if (!isEmailValid(email)) {
             _loginForm.value = LoginFormState(emailError = R.string.invalid_email)
@@ -61,6 +67,7 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         }
     }
 
+    // Updates the registration information that has been entered on the UI (Login Activity) in order to validate the input
     fun registrationDataChanged(firstname:String, surname:String, email: String, password: String, confirmedPassword:String) {
         if (!isNameValid(firstname)) {
             _loginForm.value = LoginFormState(firstnameError = com.team12.fruitwatch.R.string.invalid_firstname)
@@ -77,22 +84,22 @@ class LoginViewModel(private val loginRepository: AuthenticationRepository) : Vi
         }
     }
 
-    // A placeholder email validation check
+    // The first/surname validation check test is done here
     private fun isNameValid(name: String): Boolean {
         return name.isNotBlank()
     }
 
-    // A placeholder email validation check
+    // The email validation check test is done here
     private fun isEmailValid(email: String): Boolean {
         return email.isNotBlank() && (email.contains("@"))
     }
 
-    // A placeholder password validation check
+    // The password validation check test is done here
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
     }
 
-    // A placeholder password validation check
+    // The confirmed password validation check test is done here
     private fun isConfirmedPasswordValid(password: String, confirmedPassword: String): Boolean {
         return password.length > 5 && (confirmedPassword == password)
     }
