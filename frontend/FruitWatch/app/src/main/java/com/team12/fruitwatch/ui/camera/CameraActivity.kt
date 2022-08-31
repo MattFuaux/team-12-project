@@ -20,6 +20,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.exifinterface.media.ExifInterface
 import com.team12.fruitwatch.R
+import com.team12.fruitwatch.ui.main.MainActivity
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -38,19 +39,19 @@ class CameraActivity : Activity() {
     private var reductionFactor: Double? = null
 
     // Creates the file to hold a users captures item
-    private fun getOutputImageFile(): File {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-            val directory: File = applicationContext.getDir("app_search_images", Context.MODE_PRIVATE)
+    private fun getSavedImageFileFromInternalStorage(): File {
+        val directory: File = File(applicationContext.filesDir, "ItemSearchImages")
+        if (!directory.exists()) directory.mkdir()
+        if (MainActivity.IN_DEVELOPMENT && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
             return File(directory, "lime.jpg")
         }else{
-            val directory: File = applicationContext.getDir("search_images", Context.MODE_PRIVATE)
             return File(directory, "image.png")
         }
     }
 
     // This method handles the result of a picture being taken
     private val mPicture = PictureCallback { data, camera ->
-        val pictureFile: File = getOutputImageFile()
+        val pictureFile: File = getSavedImageFileFromInternalStorage()
         try {
             if (postProcessImage(data, pictureFile)) {
                 Log.d(TAG, "Image File Saved!")

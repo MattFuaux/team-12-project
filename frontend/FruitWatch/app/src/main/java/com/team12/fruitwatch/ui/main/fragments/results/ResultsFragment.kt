@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -100,7 +101,7 @@ class ResultsFragment : Fragment() {
             itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(pastSearch!!.itemImage,0,pastSearch!!.itemImage!!.size))
         }else{
             if (RecentResults.mostRecentSearchResults != null){
-                itemImgByteArray = getOutputImageFile().readBytes()
+                itemImgByteArray = getSavedImageFileFromInternalStorage().readBytes()
                 itemImgIV.setImageBitmap(BitmapFactory.decodeByteArray(itemImgByteArray,0,itemImgByteArray!!.size))
             }else{
                 itemImgIV.setImageBitmap(null)
@@ -128,12 +129,16 @@ class ResultsFragment : Fragment() {
         }
     }
 
-    /** Create a File for saving an image or video */
-    private fun getOutputImageFile(): File {
-        val directory: File = requireContext().getDir("search_images", Context.MODE_PRIVATE)
-        // Create imageDir
+    // Creates the file to hold a users captures item
+ private  fun getSavedImageFileFromInternalStorage():File{
+    val directory: File = File(requireContext().filesDir, "ItemSearchImages")
+    if (!directory.exists()) directory.mkdir()
+    if (MainActivity.IN_DEVELOPMENT && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+        return File(directory, "lime.jpg")
+    }else{
         return File(directory, "image.png")
     }
+}
 
     // Takes the search results and displays them on th UI
     private fun showSearchResults(result: NetworkRequestController.SearchResults?){

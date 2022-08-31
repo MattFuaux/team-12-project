@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -295,9 +296,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // Grabs the most recent item picture
     private fun getSavedImageFileFromInternalStorage(): File {
-        val directory: File = applicationContext.getDir("search_images", Context.MODE_PRIVATE)
-        val mypath = File(directory, "image.png")
-        return mypath
+        val directory: File = File(applicationContext.filesDir, "ItemSearchImages")
+        if (!directory.exists()) directory.mkdir()
+        if (MainActivity.IN_DEVELOPMENT && Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+            return File(directory, "lime.jpg")
+        }else{
+            return File(directory, "image.png")
+        }
     }
 
     // Gets the image taken by the user to start a new search
@@ -325,7 +330,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun startTextSearch(pastSearch: PastSearch) {
         mainViewModel.viewModelScope.launch(Dispatchers.IO) {
             RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithItemName(userInfo, pastSearch.itemName!!)
-            RecentResults.mostRecentPastSearch = pastSearch
+            val updatedPastSearch = PastSearchDb(applicationContext).updatePastSearchEntryDate(pastSearch)
+            if(updatedPastSearch != null){
+                RecentResults.mostRecentPastSearch = updatedPastSearch
+            }else{
+                RecentResults.mostRecentPastSearch = pastSearch
+            }
             mainViewModel.viewModelScope.launch(Dispatchers.Main) {
                 onFinishedLoading()
                 toggleResultsMenuItemVisibility()
@@ -341,11 +351,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mainViewModel.viewModelScope.launch(Dispatchers.IO) {
             RecentResults.mostRecentSearchResults = NetworkRequestController().startSearchWithImage(userInfo, imageFile)
             if (RecentResults.mostRecentSearchResults!!.name != "Unknown") {
+                RecentResults.mostRecentPastSearch = null
                 val pastSearchDb = PastSearchDb(applicationContext)
                 if (pastSearchDb.checkIfSearchIsNew(RecentResults.mostRecentSearchResults!!.name)){
-                    RecentResults.mostRecentPastSearch = PastSearch(-1L, RecentResults.mostRecentSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
-                    RecentResults.mostRecentPastSearch!!.id = PastSearchDb(applicationContext).createPastSearchEntry(RecentResults.mostRecentPastSearch!!)
-                    if (RecentResults.mostRecentPastSearch!!.id != -1L) {
+                    val pastSearch = PastSearch(-1L, RecentResults.mostRecentSearchResults!!.name, LocalDateTime.now(), imageFile.readBytes())
+                    pastSearch.id = PastSearchDb(applicationContext).createPastSearchEntry(pastSearch)
+                    if (pastSearch.id != -1L) {
                         if(pastSearchDb.determineIfPastSearchLimitIsReached()){
                             mainViewModel.viewModelScope.launch(Dispatchers.Main) {
                                 CookieBar.build(this@MainActivity)
@@ -372,8 +383,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             Log.d(TAG, "Past Search Result Added!!")
                         }
                     }
-                }else{
-                    RecentResults.mostRecentPastSearch = pastSearchDb.getPastSearchByItemName(RecentResults.mostRecentSearchResults!!.name)!!
                 }
             }else{
                 val itemUnrecognized = AlertDialog.Builder(applicationContext,R.style.Theme_FruitWatch_Dialog)

@@ -168,6 +168,20 @@ class PastSearchDb(val context: Context?) : AbstractDb(context) {
         return result
     }
 
+    fun updatePastSearchEntryDate(pastSearch: PastSearch):PastSearch?{
+        open()
+        val values  = HashMap<String, Any>()
+        val currentDateTime = LocalDateTime.now()
+        values.put(COL_SEARCH_DATE,currentDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+        if(update(pastSearch.id!!,values)){
+            close()
+            pastSearch.itemSearchDate = currentDateTime
+            return  pastSearch
+        }
+        close()
+        return null
+    }
+
     fun deleteAllPastSearches(): Boolean{
         try{
             open()

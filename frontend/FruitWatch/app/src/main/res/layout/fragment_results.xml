@@ -25,7 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_lg"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textSize="@dimen/font_size_md"
         style="@style/SearchButton"
         app:layout_constraintEnd_toEndOf="@id/frag_res_view_nutrition_btn"
@@ -39,7 +39,7 @@
         style="@style/HistoryButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textSize="@dimen/font_size_md"
         app:layout_constraintBottom_toTopOf="@+id/frag_res_view_nutrition_btn"
         app:layout_constraintEnd_toEndOf="@id/frag_res_view_nutrition_btn"
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_lg"
         android:layout_marginBottom="@dimen/margin_lg"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textSize="@dimen/font_size_md"
         app:layout_constraintBottom_toBottomOf="@+id/frag_res_item_img"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,7 +63,7 @@
         android:id="@+id/frag_res_pred_fruit_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
+        android:gravity="center"
         android:padding="@dimen/padding_lg"
         android:textColor="@color/lighttextcolor"
         android:background="@color/secondaryDarkColor"
@@ -91,18 +91,6 @@ android:padding="@dimen/padding_xl"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frag_res_item_title" />
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/frag_res_search_result_linlay"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:orientation="vertical"-->
-<!--        android:gravity="center_horizontal"-->
-
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/frag_res_view_past_searches_btn"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent">-->
-
     <TextView
         android:id="@+id/frag_res_item_title"
         android:layout_width="match_parent"
@@ -111,7 +99,7 @@ android:padding="@dimen/padding_xl"
         android:padding="@dimen/padding_lg"
         android:layout_marginTop="@dimen/margin_lg"
         android:text="@string/local_supermarket_prices"
-        android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@color/lighttextcolor"
         android:textSize="@dimen/font_size_lg"
         android:textStyle="bold"
@@ -131,9 +119,5 @@ android:padding="@dimen/padding_xl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frag_res_item_title" />
-
-
-<!--    </LinearLayout>-->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

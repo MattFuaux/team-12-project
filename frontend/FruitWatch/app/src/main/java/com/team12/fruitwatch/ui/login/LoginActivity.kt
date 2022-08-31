@@ -208,6 +208,14 @@ class LoginActivity : AppCompatActivity() {
         val preferences: SharedPreferences = applicationContext.getSharedPreferences(SHARED_PREF_NAME,Context.MODE_PRIVATE)
         val currentJWT = preferences.getString(TOKEN_PREF_NAME,"None")
         if(currentJWT != "None"){
+            CookieBar.build(this)
+                .setTitle("Auto Logging In")
+                .setBackgroundColor(R.color.green_500)
+                .setIcon(R.drawable.ic_baseline_login_24)
+                .setAnimationIn(android.R.anim.slide_in_left, android.R.anim.slide_in_left)
+                .setAnimationOut(android.R.anim.slide_out_right, android.R.anim.slide_out_right)
+                .setDuration(2000)
+                .show()
             Log.i(TAG,"Auto Login Attempted")
             // Some entry found, checking if it is valid
             CoroutineScope(Dispatchers.Main).launch {
