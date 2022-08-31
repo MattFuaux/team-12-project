@@ -1,4 +1,4 @@
-# Fruit Watch Android App v0.4
+# Fruit Watch Android App v0.5
 
 Author: Cameron Akers
 
@@ -13,7 +13,7 @@ The Fruit Watch Android app is just a frontend. It does not process the image us
 ## Implemented Features
 
 - Full Authentication (Registration, Login and Logout)
-- Navigation through various screens (Home, History, Settings)
+- Navigation through various screens (Search & History, Results, Settings)
 - Ability to start a search by taking a picture
 - Ability to show search results to the screen
 - Search History List
