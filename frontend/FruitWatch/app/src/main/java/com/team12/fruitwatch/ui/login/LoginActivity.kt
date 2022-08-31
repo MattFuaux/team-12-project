@@ -161,6 +161,7 @@ class LoginActivity : AppCompatActivity() {
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
         }
         checkForValidJWT()
+        autoShowRegistrationOnFirstLoad()
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
@@ -170,6 +171,14 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun autoShowRegistrationOnFirstLoad(){
+        val preferences: SharedPreferences = applicationContext.getSharedPreferences(applicationContext.packageName + "_preferences",Context.MODE_PRIVATE)
+        val first = preferences.getBoolean("First_Load",true)
+        if(first){
+            layoutToggle(true)
+            preferences.edit().putBoolean("First_Load",false).apply()
+        }
+    }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         CookieBar.build(this)
