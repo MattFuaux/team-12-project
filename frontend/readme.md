@@ -31,7 +31,7 @@ The Fruit Watch Android app is just a frontend. It does not process the image us
 
 ## Prerequisites
 
-- Smartphone with at least Android 7.0 (Nougat)
+- Smartphone with at least Android 8.0 (Oreo)
 - The latest APK file found in the `frontend/APKs` folder in this repository
 
 ## Installation Steps
