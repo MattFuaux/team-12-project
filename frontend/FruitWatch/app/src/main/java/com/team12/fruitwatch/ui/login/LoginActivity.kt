@@ -184,14 +184,14 @@ class LoginActivity : AppCompatActivity() {
                 loading.visibility = View.INVISIBLE
             }
         }
-//        if (MainActivity.IN_DEVELOPMENT) {
+        if (MainActivity.IN_DEVELOPMENT) {
             email.text = Editable.Factory.getInstance().newEditable("janetdoe@mailbox.com")
             password.text = Editable.Factory.getInstance().newEditable("janetdoe")
 
             firstname.text = Editable.Factory.getInstance().newEditable("janet")
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
-//        }
+        }
         checkForValidJWT()
         autoShowRegistrationOnFirstLoad()
     }
