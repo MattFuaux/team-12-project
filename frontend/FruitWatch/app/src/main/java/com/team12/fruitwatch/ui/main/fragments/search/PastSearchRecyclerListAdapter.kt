@@ -69,6 +69,10 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
         // Converting seconds to dates
         val mDifferenceDates = mDifference / (24 * 60 * 60)
 
+        if(mDifferenceDates == 0L){
+            // Converting the above integer to string
+            return "Last Searched: Today"
+        }
         // Converting the above integer to string
         return "Last Searched: $mDifferenceDates Days Ago "
     }
