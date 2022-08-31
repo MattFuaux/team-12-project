@@ -36,7 +36,11 @@ class LoginViewModel(private val authenticationDataSource: AuthenticationDataSou
         if (registrationResult is Result.Success) {
             _loginResult.value = LoginResult(success = LoggedInUserView(registrationResult.data.userId,registrationResult.data.displayName,registrationResult.data.jwt))
         } else {
-            _loginResult.value = LoginResult(error = R.string.registration_failed)
+            if((registrationResult as Result.Error).exception.message == "Email already exists"){
+                _loginResult.value = LoginResult(error = R.string.registration_email_taken)
+            }else{
+                _loginResult.value = LoginResult(error = R.string.registration_failed)
+            }
         }
     }
 
@@ -77,9 +81,11 @@ class LoginViewModel(private val authenticationDataSource: AuthenticationDataSou
             _loginForm.value = LoginFormState(emailError = R.string.invalid_email)
         } else if (!isPasswordValid(password)) {
             _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
-        } else if (!isConfirmedPasswordValid(password, confirmedPassword)) {
-            _loginForm.value = LoginFormState(confirmPasswordError = R.string.invalid_password)
-        } else {
+        } else if (!isPasswordValid(confirmedPassword)) {
+            _loginForm.value = LoginFormState(confirmPasswordError = R.string.invalid_confirmed_password)
+        }else if (!isConfirmedPasswordEqualToPassword(password,confirmedPassword)) {
+            _loginForm.value = LoginFormState(confirmPasswordError = R.string.inequal_passwords)
+        }else {
             _loginForm.value = LoginFormState(isDataValid = true)
         }
     }
@@ -99,8 +105,8 @@ class LoginViewModel(private val authenticationDataSource: AuthenticationDataSou
         return password.length > 5
     }
 
-    // The confirmed password validation check test is done here
-    private fun isConfirmedPasswordValid(password: String, confirmedPassword: String): Boolean {
-        return password.length > 5 && (confirmedPassword == password)
+    // The confirmed password equality validation check test is done here
+    private fun isConfirmedPasswordEqualToPassword(password: String, confirmedPassword: String): Boolean {
+        return confirmedPassword == password
     }
 }

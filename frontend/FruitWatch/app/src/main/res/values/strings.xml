@@ -16,8 +16,11 @@
     <string name="invalid_surname">Not a valid surname</string>
     <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_confirmed_password">Confirmed Password must be >5 characters</string>
+    <string name="inequal_passwords">Password must match Confirmed Password</string>
     <string name="check_valid_failed">"Login Session Expired!\nPlease login again"</string>
-    <string name="login_failed">"Login failed"</string>
+    <string name="login_failed">"Login details incorrect"</string>
+    <string name="registration_email_taken">"Email already taken"</string>
     <string name="registration_failed">"Registration failed"</string>
     <string name="logout_success">"Log out successful"</string>
     <string name="logout_failed">"Log out failed"</string>

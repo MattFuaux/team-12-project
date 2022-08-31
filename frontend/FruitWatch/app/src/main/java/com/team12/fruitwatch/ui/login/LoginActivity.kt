@@ -70,6 +70,18 @@ class LoginActivity : AppCompatActivity() {
             if (loginState.passwordError != null) {
                 password.error = getString(loginState.passwordError)
             }
+            if(layoutTgl.isChecked) {
+                if (loginState.firstnameError != null) {
+                    firstname.error = getString(loginState.firstnameError)
+                }
+                if (loginState.surnameError != null) {
+                    surname.error = getString(loginState.surnameError)
+                }
+                if (loginState.confirmPasswordError != null) {
+                    confirmPassword.error = getString(loginState.confirmPasswordError)
+                    password.error = getString(loginState.confirmPasswordError)
+                }
+            }
         })
 
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
@@ -88,18 +100,38 @@ class LoginActivity : AppCompatActivity() {
         })
 
         email.afterTextChanged {
-            loginViewModel.loginDataChanged(
-                email.text.toString(),
-                password.text.toString()
-            )
-        }
-
-        password.apply {
-            afterTextChanged {
+            if(layoutTgl.isChecked) {
+                loginViewModel.registrationDataChanged(
+                    firstname.text.toString(),
+                    surname.text.toString(),
+                    email.text.toString(),
+                    password.text.toString(),
+                    confirmPassword.text.toString()
+                )
+            }else{
                 loginViewModel.loginDataChanged(
                     email.text.toString(),
                     password.text.toString()
                 )
+            }
+        }
+
+        password.apply {
+            afterTextChanged {
+                if(layoutTgl.isChecked) {
+                    loginViewModel.registrationDataChanged(
+                        firstname.text.toString(),
+                        surname.text.toString(),
+                        email.text.toString(),
+                        password.text.toString(),
+                        confirmPassword.text.toString()
+                    )
+                }else{
+                    loginViewModel.loginDataChanged(
+                        email.text.toString(),
+                        password.text.toString()
+                    )
+                }
             }
 
             setOnEditorActionListener { _, actionId, _ ->
@@ -152,14 +184,14 @@ class LoginActivity : AppCompatActivity() {
                 loading.visibility = View.INVISIBLE
             }
         }
-        if (MainActivity.IN_DEVELOPMENT) {
+//        if (MainActivity.IN_DEVELOPMENT) {
             email.text = Editable.Factory.getInstance().newEditable("janetdoe@mailbox.com")
-            password.text = Editable.Factory.getInstance().newEditable("testpassword")
+            password.text = Editable.Factory.getInstance().newEditable("janetdoe")
 
             firstname.text = Editable.Factory.getInstance().newEditable("janet")
             surname.text = Editable.Factory.getInstance().newEditable("doe")
             confirmPassword.text = Editable.Factory.getInstance().newEditable("janetdoe")
-        }
+//        }
         checkForValidJWT()
         autoShowRegistrationOnFirstLoad()
     }

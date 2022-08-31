@@ -1,9 +1,13 @@
 package com.team12.fruitwatch.data
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.team12.fruitwatch.controllers.NetworkRequestController
 import com.team12.fruitwatch.data.model.LoggedInUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.IOException
 
 /**
@@ -20,8 +24,8 @@ class AuthenticationDataSource {
                 if (response.statusCode == 200) {
                     return@withContext Result.Success(response.data as LoggedInUser)
                 }
-                throw Exception()
-
+                val jsonObject = JSONObject(response.data as String)
+                throw Exception((jsonObject.get("errors") as JSONArray).getJSONObject(0).getString("message"))
             } catch (e: Exception) {
                 return@withContext Result.Error(IOException("Error logging in", e))
             }
@@ -40,6 +44,11 @@ class AuthenticationDataSource {
                         return@withContext Result.Success(loginResponse.data as LoggedInUser)
                     }
                     throw Exception("Error Logging User In")
+                }else if(registrationResponse.statusCode == 400) {
+                    val jsonObject = JSONObject(registrationResponse.data as String)
+                    if(jsonObject.has("errors")){
+                        throw Exception((jsonObject.get("errors") as JSONArray).getJSONObject(0).getString("message"))
+                    }
                 }
                 throw Exception("Error Registering User")
             } catch (e: Exception) {
