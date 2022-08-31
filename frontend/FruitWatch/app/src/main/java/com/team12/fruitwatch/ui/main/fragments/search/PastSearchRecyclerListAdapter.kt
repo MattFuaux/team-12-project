@@ -70,7 +70,7 @@ class PastSearchRecyclerListAdapter(private val pastSearchList: List<PastSearch>
         val mDifferenceDates = mDifference / (24 * 60 * 60)
 
         // Converting the above integer to string
-        return "$mDifferenceDates Days Ago "
+        return "Last Searched: $mDifferenceDates Days Ago "
     }
 
     override fun getItemCount(): Int {
